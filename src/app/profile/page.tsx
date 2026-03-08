@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -84,10 +83,9 @@ export default function ProfilePage() {
       if (!user) {
         router.push("/login");
       } else {
-        // Initialize form with current values
         profileForm.reset({
           displayName: user.displayName || "",
-          mobileNumber: "", // Will be fetched from Firestore if needed
+          mobileNumber: "",
           photoURL: user.photoURL || "",
         });
       }
@@ -124,13 +122,11 @@ export default function ProfilePage() {
     if (!auth?.currentUser || !firestore) return;
 
     try {
-      // 1. Update Firebase Auth Profile
       await updateProfile(auth.currentUser, {
         displayName: data.displayName,
         photoURL: data.photoURL || null,
       });
 
-      // 2. Update Firestore User Doc
       const userDocRef = doc(firestore, "users", auth.currentUser.uid);
       await updateDoc(userDocRef, {
         displayName: data.displayName,
@@ -307,7 +303,6 @@ export default function ProfilePage() {
         </CardContent>
       </Card>
 
-      {/* Change Password Card */}
       <Card className="shadow-xl">
         <CardHeader>
           <CardTitle className="flex items-center">
@@ -360,7 +355,6 @@ export default function ProfilePage() {
           </Form>
         </CardContent>
       </Card>
-
     </div>
   );
 }

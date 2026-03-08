@@ -3,8 +3,8 @@
 
 import { useState, useEffect, useCallback, useMemo, memo } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { APP_NAME } from "@/lib/constants";
-import type { QuestionType, TestSeriesType, UserAnswer, ExamPhase } from "@/lib/types";
+import { APP_NAME, ADMIN_EMAIL } from "@/lib/constants";
+import type { QuestionType, TestSeriesType, UserAnswer, ExamPhase, PurchaseType } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -17,8 +17,8 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { useFirestore } from "@/firebase";
-import { doc, getDoc, collection, getDocs } from "firebase/firestore";
+import { useFirestore, useUser } from "@/firebase";
+import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { getQuestionsFromTex } from "@/lib/tex-parser";
 import { MathText } from "@/components/shared/MathText";
 
@@ -133,6 +133,7 @@ export default function ExamPage() {
   const { toast } = useToast();
   const testId = params.id as string;
   const firestore = useFirestore();
+  const { user, loading: userLoading } = useUser();
 
   const [testSeries, setTestSeries] = useState<TestSeriesType | null>(null);
   const [questions, setQuestions] = useState<QuestionType[]>([]);
@@ -175,56 +176,90 @@ export default function ExamPage() {
   }, [userAnswers, questions]);
 
   useEffect(() => {
+    if (!userLoading && !user) {
+        router.push('/signup');
+        return;
+    }
+  }, [user, userLoading, router]);
+
+  useEffect(() => {
     const fetchTestDetails = async () => {
+      if (userLoading || !user || !firestore) return;
       setExamPhase('loading');
 
-      if (testId === 'latex-question-bank') {
-          const texQuestions = await getQuestionsFromTex();
-          if (texQuestions.length > 0) {
-              const seriesData: TestSeriesType = {
-                  id: 'latex-question-bank',
-                  name: 'General Question Bank (from .tex)',
-                  description: 'A collection of questions rendered from a LaTeX file and presented as an interactive quiz.',
-                  price: 0,
-                  imageUrl: 'https://picsum.photos/seed/latex-questions/600/400',
-                  data_ai_hint: 'library books',
-                  subject: 'General',
-                  durationPerTest: 60, // Default duration for tex quiz
-                  createdAt: new Date().toISOString(),
-              };
-              initializeLocalExamState(seriesData, texQuestions);
-          } else {
-              toast({ title: "Error", description: "Could not parse any questions from the TeX file.", variant: "destructive" });
-              setExamPhase('error');
-          }
-          return;
-      }
-      
-      if (!firestore) {
-        toast({ title: "Error", description: "Database not available.", variant: "destructive" });
-        setExamPhase('error');
-        return;
-      }
-
       try {
-        const seriesDocRef = doc(firestore, "testSeries", testId);
-        const seriesSnap = await getDoc(seriesDocRef);
+        const isLatexBank = testId === 'latex-question-bank';
+        const isDemo = testId === 'demo-paid-test';
+        const isAdminUser = user.email === ADMIN_EMAIL;
+        
+        let fetchedSeries: TestSeriesType;
+        let fetchedQuestions: QuestionType[] = [];
 
-        if (!seriesSnap.exists()) {
-          throw new Error("Test series not found.");
+        if (isLatexBank) {
+            fetchedQuestions = await getQuestionsFromTex();
+            fetchedSeries = {
+                id: 'latex-question-bank',
+                name: 'General Question Bank (Free)',
+                description: 'A collection of questions rendered from a LaTeX file.',
+                price: 0,
+                imageUrl: 'https://picsum.photos/seed/latex-questions/600/400',
+                subject: 'General',
+                durationPerTest: 60,
+                createdAt: new Date().toISOString(),
+            };
+        } else if (isDemo) {
+            fetchedSeries = {
+                id: 'demo-paid-test',
+                name: 'Premium Mock Test (Demo)',
+                description: 'A sample paid test to verify the payment and paywall system.',
+                price: 1,
+                imageUrl: 'https://picsum.photos/seed/demo-pay/600/400',
+                subject: 'IAT',
+                durationPerTest: 180,
+                createdAt: new Date().toISOString(),
+            };
+            fetchedQuestions = [
+                {
+                    id: 'demo-q1',
+                    text: 'What is the correct way to test the VidyaHeist paywall?',
+                    options: [
+                        { id: 'a', text: 'Scan QR, Pay, submit UTR' },
+                        { id: 'b', text: 'Call Admin' },
+                        { id: 'c', text: 'Wait forever' }
+                    ],
+                    correctAnswerId: 'a',
+                    topic: 'System Demo'
+                }
+            ];
+        } else {
+            const seriesDocRef = doc(firestore, "testSeries", testId);
+            const seriesSnap = await getDoc(seriesDocRef);
+            if (!seriesSnap.exists()) throw new Error("Test series not found.");
+            fetchedSeries = { id: seriesSnap.id, ...seriesSnap.data() } as TestSeriesType;
+            const questionsQuery = collection(firestore, "testSeries", testId, "questions");
+            const questionsSnap = await getDocs(questionsQuery);
+            fetchedQuestions = questionsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as QuestionType));
         }
-        
-        const fetchedSeries = { id: seriesSnap.id, ...seriesSnap.data() } as TestSeriesType;
-        
-        const questionsQuery = collection(firestore, "testSeries", testId, "questions");
-        const questionsSnap = await getDocs(questionsQuery);
-        const fetchedQuestions = questionsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as QuestionType));
+
+        // Check ownership if not free and not admin
+        if (!isAdminUser && fetchedSeries.price > 0) {
+            const q = query(
+                collection(firestore, "purchases"),
+                where("userId", "==", user.uid),
+                where("seriesId", "==", testId),
+                where("status", "==", "verified")
+            );
+            const purchaseSnap = await getDocs(q);
+            if (purchaseSnap.empty) {
+                toast({ title: "Course Locked", description: "Please complete your purchase to access this test.", variant: "destructive" });
+                router.push(`/checkout/${testId}`);
+                return;
+            }
+        }
         
         if (fetchedQuestions.length === 0) {
           toast({ title: "No Questions", description: "This test series currently has no questions.", variant: "destructive" });
           setExamPhase('error');
-          setTestSeries(fetchedSeries);
-          setQuestions([]);
           return;
         }
         
@@ -237,10 +272,8 @@ export default function ExamPage() {
       }
     };
 
-    if (testId) {
-        fetchTestDetails();
-    }
-  }, [testId, firestore, toast, initializeLocalExamState]);
+    fetchTestDetails();
+  }, [testId, firestore, toast, initializeLocalExamState, user, userLoading, router]);
 
 
   useEffect(() => {
@@ -349,22 +382,17 @@ export default function ExamPage() {
   }
 
   if (examPhase === 'error' || !testSeries) {
-     return (
+    return (
       <Card className="max-w-2xl mx-auto my-8 shadow-xl">
         <CardHeader className="text-center">
             <ShieldX className="mx-auto h-16 w-16 text-destructive mb-4" />
             <CardTitle className="text-3xl text-destructive">Test Load Error</CardTitle>
             <CardDescription className="text-lg">
-                {testSeries && questions.length === 0 ? `The test series "${testSeries.name}" has no questions.` : "We couldn't load the test details. It might not exist or there was a network issue."}
+                {testSeries && questions.length === 0 ? `The test series "${testSeries.name}" has no questions.` : "We couldn't load the test details."}
             </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
             <Button onClick={() => router.push('/store')} variant="outline" size="lg">Back to Test Series</Button>
-            {testSeries && questions.length === 0 && (
-                <Button onClick={() => router.push(`/admin/edit-quiz/${testSeries.id}`)} size="lg" className="ml-4">
-                   Add Questions (Admin)
-                </Button>
-            )}
         </CardContent>
       </Card>
     );
@@ -372,8 +400,6 @@ export default function ExamPage() {
   
 
   if (examPhase === 'instructions' || examPhase === 'summary') {
-    const totalMarksExample = questions.length * (questions[0]?.subject === "JEE Advanced" ? 3 : 4);
-
     return (
       <Card className="max-w-2xl mx-auto my-8 shadow-xl">
         <CardHeader>
@@ -387,14 +413,12 @@ export default function ExamPage() {
                 <p><strong>Subject:</strong> {testSeries.subject || 'General'}</p>
                 <p><strong>Questions:</strong> {questions.length}</p>
                 <p><strong>Duration:</strong> {testSeries.durationPerTest || (timeLeft / 60)} minutes</p>
-                <p><strong>Total Marks (Example):</strong> {totalMarksExample}</p>
               </div>
               <h3 className="font-semibold text-xl mt-6">Instructions:</h3>
               <ul className="list-disc list-inside text-left text-muted-foreground space-y-1">
-                <li>Each question has multiple options. Only one option is correct for most questions.</li>
+                <li>Each question has multiple options. Only one option is correct.</li>
                 <li>Ensure you submit the test before the time runs out.</li>
-                <li>You can navigate between questions using the palette or next/previous buttons.</li>
-                <li>Mark questions for review if you want to revisit them later.</li>
+                <li>You can navigate between questions using the palette.</li>
               </ul>
               <Button onClick={handleStartTest} size="lg" className="mt-8 w-full">Start Test</Button>
             </>
@@ -403,13 +427,12 @@ export default function ExamPage() {
             <div className="text-center space-y-4">
               <h2 className="text-2xl font-semibold">Test Completed!</h2>
               <p className="text-lg">Your Score: <span className="font-bold text-primary">{score}</span> out of {questions.length}</p>
-              <p className="text-muted-foreground">Total time taken: {formatTime((testSeries.durationPerTest || 180) * 60 - timeLeft)}</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
                 <Button onClick={() => setExamPhase('review')} size="lg">Review Answers</Button>
                 <Button onClick={handleStartTest} variant="outline" size="lg">
                   <RefreshCcw className="mr-2 h-4 w-4" /> Start Again
                 </Button>
-                <Button onClick={() => router.push('/store')} variant="secondary" size="lg">Back to Test Series</Button>
+                <Button onClick={() => router.push('/store')} variant="secondary" size="lg">Back to Store</Button>
               </div>
             </div>
           )}
@@ -417,24 +440,6 @@ export default function ExamPage() {
       </Card>
     );
   }
-
-  
-
-  if (!currentQuestion) {
-     if (examPhase === 'taking' && questions.length === 0) {
-        return (
-            <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)]">
-                 <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-                <p className="text-xl text-destructive">No questions available for this test.</p>
-                <Button onClick={() => router.push('/store')} variant="outline" className="mt-4">
-                    Back to Store
-                </Button>
-            </div>
-        );
-     }
-     return null;
-  }
-
 
   return (
     <div className="flex flex-col md:flex-row gap-4 md:gap-6 min-h-[calc(100vh-8rem)] pt-2">
@@ -473,7 +478,7 @@ export default function ExamPage() {
       <Card className="flex-grow flex flex-col shadow-lg w-full md:w-2/3">
         <CardHeader className="border-b p-4 hidden md:block">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-primary">Question {currentQuestionIndex + 1} of {questions.length} ({testSeries.subject || 'General'})</CardTitle>
+            <CardTitle className="text-primary">Question {currentQuestionIndex + 1} of {questions.length}</CardTitle>
             <div className="flex items-center gap-2 text-destructive font-semibold p-2 border border-destructive rounded-md">
               <Clock className="h-5 w-5" />
               <span>{formatTime(timeLeft)}</span>
@@ -497,14 +502,11 @@ export default function ExamPage() {
                   className={cn("flex items-center space-x-3 p-3 border rounded-md transition-all hover:bg-secondary/50 cursor-pointer",
                     examPhase === 'review' && option.id === currentQuestion.correctAnswerId && "bg-green-100 dark:bg-green-800 border-green-500",
                     examPhase === 'review' && option.id === currentAnswer?.selectedOptionId && option.id !== currentQuestion.correctAnswerId && "bg-red-100 dark:bg-red-800 border-red-500",
-                    currentAnswer?.selectedOptionId === option.id && "border-primary ring-1 ring-primary dark:border-primary dark:ring-primary"
+                    currentAnswer?.selectedOptionId === option.id && "border-primary ring-1 ring-primary"
                   )}
                   onClick={() => (examPhase !== 'review' && examPhase !== 'summary') && handleAnswerChange(currentQuestion.id, option.id)}
                 >
-                  <RadioGroupItem value={option.id} id={option.id} 
-                    checked={currentAnswer?.selectedOptionId === option.id}
-                    aria-label={option.text}
-                  />
+                  <RadioGroupItem value={option.id} id={option.id} />
                   <Label htmlFor={option.id} className="flex-1 cursor-pointer text-sm md:text-base">
                     <MathText text={option.text} />
                   </Label>
@@ -527,24 +529,17 @@ export default function ExamPage() {
               onClick={() => navigateQuestion(currentQuestionIndex - 1)}
               disabled={currentQuestionIndex === 0 || examPhase === 'review' || examPhase === 'summary'}
             >
-              <ArrowLeft className="mr-2 h-4 w-4 md:hidden lg:inline-block" /> Previous
+              <ArrowLeft className="mr-2 h-4 w-4" /> Previous
             </Button>
             
             <div className="flex gap-2">
-             <Button
-                variant="outline"
-                onClick={() => handleClearResponse(currentQuestion.id)}
-                disabled={examPhase === 'review' || examPhase === 'summary' || !currentAnswer?.isAnswered}
-              >
-                Clear Response
-              </Button>
               <Button
                 variant={currentAnswer?.isMarkedForReview ? "secondary" : "outline"}
                 onClick={() => handleMarkForReview(currentQuestion.id)}
                 disabled={examPhase === 'review' || examPhase === 'summary'}
                 className={currentAnswer?.isMarkedForReview ? "bg-purple-500 hover:bg-purple-600 text-white" : ""}
               >
-                <Bookmark className="mr-2 h-4 w-4" /> {currentAnswer?.isMarkedForReview ? "Unmark" : "Mark"}
+                <Bookmark className="mr-2 h-4 w-4" /> Mark for Review
               </Button>
             </div>
 
@@ -557,7 +552,7 @@ export default function ExamPage() {
                 onClick={() => navigateQuestion(currentQuestionIndex + 1)}
                 disabled={currentQuestionIndex === questions.length - 1 || examPhase === 'review' || examPhase === 'summary'}
               >
-                Save & Next <ArrowRight className="ml-2 h-4 w-4 md:hidden lg:inline-block" />
+                Save & Next <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             )}
           </div>
@@ -591,7 +586,3 @@ export default function ExamPage() {
     </div>
   );
 }
-
-    
-
-    

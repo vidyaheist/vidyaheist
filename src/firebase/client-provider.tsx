@@ -1,8 +1,6 @@
-
 'use client';
 
-import { FirebaseProvider } from '@/firebase/provider';
-import { initializeFirebase } from '@/firebase';
+import { FirebaseProvider, initializeFirebase } from './provider';
 
 export const FirebaseClientProvider = ({
   children,

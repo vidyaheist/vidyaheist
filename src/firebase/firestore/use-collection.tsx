@@ -66,7 +66,12 @@ export function useCollectionQuery<T>(
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!firestore) return;
+    // If we don't have a value to query for (e.g. user is logged out), don't run the query
+    if (!firestore || value === undefined || value === null) {
+      setLoading(false);
+      return;
+    }
+
     const q = query(
       collection(firestore, collectionPath),
       where(field, operator, value)
@@ -82,6 +87,7 @@ export function useCollectionQuery<T>(
         setData(a);
         setLoading(false);
       } catch (err) {
+        // Only emit if it's a real error, not just a missing auth on a public page
         const permissionError = new FirestorePermissionError({
           path: (q as Query).path,
           operation: 'list',

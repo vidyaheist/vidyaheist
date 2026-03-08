@@ -135,8 +135,8 @@ export default function SignupPage() {
   return (
     <div className="login-form-container">
       <div className="login-form">
-        <h1 className="text-3xl font-bold text-center mb-2 text-gray-100">Create an Account</h1>
-        <p className="text-center text-sm text-gray-400 mb-6">
+        <h1 className="text-3xl font-bold text-center mb-2 text-black-100">Create an Account</h1>
+        <p className="text-center font-bold text-2xl text-gray-400 mb-2">
             Join {APP_NAME} to start your exam preparation journey.
         </p>
         <Form {...form}>

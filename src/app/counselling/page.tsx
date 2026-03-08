@@ -1,80 +1,262 @@
+
 // src/app/counselling/page.tsx
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  School, 
+  GraduationCap, 
+  Library, 
+  CheckCircle2, 
+  ArrowRight,
+  ShieldCheck,
+  Users,
+  Star,
+  Quote,
+  ChevronLeft,
+  ChevronRight
+} from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/firebase';
+
+const counsellingModules = [
+  {
+    title: "JoSAA & JAC Delhi",
+    subtitle: "Engineering Admissions",
+    description: "End-to-end guidance for IITs, NITs, IIITs, and Delhi's premier colleges like DTU, NSUT, and IGDTUW.",
+    icon: <School className="w-10 h-10 text-primary" />,
+    features: ["1-on-1 Counselling + video/voice call support","Choice Filling Optimization", "Rank-based College Prediction", "Document Verification Support"],
+    color: "bg-blue-500/10",
+  },
+  {
+    title: "IAT & NEST",
+    subtitle: "Research Admissions",
+    description: "Specialized counselling for IISERs, NISER, and UM-DAE CEBS. The ultimate guide for research aspirants.",
+    icon: <GraduationCap className="w-10 h-10 text-accent" />,
+    features: ["1-on-1 Counselling + video/voice call support","IISER Preference Lists", "NISER Admission Process", "Research Career Roadmap"],
+    color: "bg-teal-500/10",
+  },
+  {
+    title: "MHTCET",
+    subtitle: "State Counselling",
+    description: "Expert assistance for CAP rounds in Maharashtra's top engineering and pharmacy institutes.",
+    icon: <Library className="w-10 h-10 text-primary" />,
+    features: ["1-on-1 Counselling + video/voice call support","CAP Round Strategy", "Institute-wise Cutoff Analysis", "State Quota Benefits"],
+    color: "bg-indigo-500/10",
+  }
+];
+
+const testimonials = [
+  {
+    name: "Ankit Verma",
+    college: "IIT Delhi (JoSAA)",
+    text: "The choice filling strategy provided by VidyaHeist was the reason I got into my dream branch. They understand the trends perfectly!",
+    rating: 5,
+    image: "https://picsum.photos/seed/counsel1/100/100",
+  },
+  {
+    name: "Sneha Rao",
+    college: "IISER Mohali (IAT)",
+    text: "Navigating the IISER preference list was so confusing until I spoke to the mentors here. Their 1-on-1 support is truly world-class.",
+    rating: 5,
+    image: "https://picsum.photos/seed/counsel2/100/100",
+  },
+  {
+    name: "Patil Rohan",
+    college: "COEP Pune (MHTCET)",
+    text: "I was about to make a huge mistake in my CAP rounds. VidyaHeist corrected my list and saved my career. Grateful!",
+    rating: 5,
+    image: "https://picsum.photos/seed/counsel3/100/100",
+  },
+];
 
 export default function CounsellingPage() {
+  const [current, setCurrent] = useState(0);
+  const router = useRouter();
+  const { user } = useUser();
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % testimonials.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleAction = () => {
+    if (!user) {
+      router.push('/signup');
+    } else {
+      // In the future, this will open the booking or details page
+      alert("Welcome to the Counselling Dashboard! Detailed modules coming soon.");
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-16rem)] py-12">
-      <style jsx global>{`
-        .dot-flashing {
-          position: relative;
-          width: 10px;
-          height: 10px;
-          border-radius: 5px;
-          background-color: hsl(var(--primary));
-          color: hsl(var(--primary));
-          animation: dotFlashing 1s infinite linear alternate;
-          animation-delay: .5s;
-        }
-        
-        .dot-flashing::before, .dot-flashing::after {
-          content: '';
-          display: inline-block;
-          position: absolute;
-          top: 0;
-        }
-        
-        .dot-flashing::before {
-          left: -15px;
-          width: 10px;
-          height: 10px;
-          border-radius: 5px;
-          background-color: hsl(var(--primary));
-          color: hsl(var(--primary));
-          animation: dotFlashing 1s infinite alternate;
-          animation-delay: 0s;
-        }
-        
-        .dot-flashing::after {
-          left: 15px;
-          width: 10px;
-          height: 10px;
-          border-radius: 5px;
-          background-color: hsl(var(--primary));
-          color: hsl(var(--primary));
-          animation: dotFlashing 1s infinite alternate;
-          animation-delay: 1s;
-        }
-        
-        @keyframes dotFlashing {
-          0% {
-            background-color: hsl(var(--primary));
-          }
-          50%,
-          100% {
-            background-color: hsla(var(--primary) / 0.3);
-          }
-        }
-      `}</style>
-      <Card className="w-full max-w-lg text-center shadow-xl">
-        <CardHeader>
-          <CardTitle className="text-3xl font-bold text-primary">
-            Counselling Services
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <p className="text-xl text-muted-foreground">
-            Coming Soon
-          </p>
-          <div className="flex justify-center items-center h-10">
-            <div className="dot-flashing"></div>
+    <div className="flex flex-col space-y-12 pb-20">
+      {/* Header Section */}
+      <section className="text-center space-y-4 py-12 bg-primary/5 rounded-3xl border border-primary/10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-bold text-primary mb-2"
+        >
+          <ShieldCheck className="h-4 w-4" />
+          <span>Expert Admission Mentorship</span>
+        </motion.div>
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-primary">
+          College Counselling Services
+        </h1>
+        <p className="max-w-2xl mx-auto text-lg text-muted-foreground font-medium px-4">
+          Navigate the complex admission process with confidence. Get personalized guidance to secure your seat in India's top-tier institutions.
+        </p>
+      </section>
+
+      {/* Grid Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
+        {counsellingModules.map((module, idx) => (
+          <motion.div
+            key={idx}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: idx * 0.1 }}
+          >
+            <Card className="h-full flex flex-col border-2 border-border/50 transition-all hover:shadow-2xl hover:border-primary/30 group relative overflow-hidden">
+              <div className={`absolute top-0 right-0 w-32 h-32 ${module.color} blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500`} />
+              
+              <CardHeader className="relative">
+                <div className="mb-4 p-3 rounded-2xl bg-background border border-border shadow-sm w-fit group-hover:scale-110 transition-transform">
+                  {module.icon}
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-bold text-accent tracking-wider uppercase">
+                    {module.subtitle}
+                  </p>
+                  <CardTitle className="text-2xl font-bold">{module.title}</CardTitle>
+                </div>
+                <CardDescription className="text-base pt-2">
+                  {module.description}
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="flex-grow space-y-4 relative">
+                <div className="h-px bg-border w-full" />
+                <ul className="space-y-3">
+                  {module.features.map((feature, i) => (
+                    <li key={i} className="flex items-center text-sm text-muted-foreground">
+                      <CheckCircle2 className="mr-2 h-4 w-4 text-green-500 flex-shrink-0" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+
+              <CardFooter className="relative">
+                <Button onClick={handleAction} className="w-full group/btn rounded-xl py-6" variant="outline">
+                  View Details 
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                </Button>
+              </CardFooter>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Testimonials Section */}
+      <section className="w-full py-16 bg-accent/5 rounded-[3rem] border border-accent/10 relative overflow-hidden">
+        <div className="container px-4 mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold tracking-tight text-primary mb-2">Mentorship Success Stories</h2>
+            <p className="text-muted-foreground">What students say about our counselling support.</p>
           </div>
-          <p className="text-sm text-muted-foreground">
-            We are working hard to bring you dedicated counselling support. Please check back later!
-          </p>
-        </CardContent>
-      </Card>
+
+          <div className="relative max-w-4xl mx-auto px-12">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={current}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.5 }}
+                className="bg-background rounded-3xl p-8 md:p-12 shadow-xl border border-border flex flex-col md:flex-row gap-8 items-center"
+              >
+                <div className="relative flex-shrink-0">
+                  <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-accent/20 shadow-lg">
+                    <Image 
+                      src={testimonials[current].image} 
+                      alt={testimonials[current].name}
+                      width={128}
+                      height={128}
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 bg-accent text-accent-foreground p-2 rounded-full shadow-lg">
+                    <Quote className="w-4 h-4" />
+                  </div>
+                </div>
+
+                <div className="flex-grow space-y-4 text-center md:text-left">
+                  <div className="flex justify-center md:justify-start gap-1">
+                    {[...Array(testimonials[current].rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <p className="text-xl font-medium italic text-foreground/90 leading-relaxed">
+                    "{testimonials[current].text}"
+                  </p>
+                  <div>
+                    <h4 className="text-xl font-bold text-primary">{testimonials[current].name}</h4>
+                    <p className="text-muted-foreground font-semibold">{testimonials[current].college}</p>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Controls */}
+            <button 
+              onClick={() => setCurrent((prev) => (prev - 1 + testimonials.length) % testimonials.length)}
+              className="absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background border border-border shadow-md hover:bg-secondary transition-colors"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button 
+              onClick={() => setCurrent((prev) => (prev + 1) % testimonials.length)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background border border-border shadow-md hover:bg-secondary transition-colors"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Section */}
+      <section className="container mx-auto px-4">
+        <div className="bg-secondary/30 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 border border-border">
+          <div className="flex-1 space-y-4 text-center md:text-left">
+            <h2 className="text-3xl font-bold text-primary">Why choose our Counselling?</h2>
+            <p className="text-muted-foreground text-lg">
+              Admissions are not just about marks; they are about strategy. Our mentors are graduates from IISERs, NITs, and top state colleges who understand the ground reality.
+            </p>
+            <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-2">
+              <div className="flex items-center gap-2 bg-background px-4 py-2 rounded-full border border-border text-sm font-medium">
+                <Users className="w-4 h-4 text-primary" /> 500+ Mentored
+              </div>
+              <div className="flex items-center gap-2 bg-background px-4 py-2 rounded-full border border-border text-sm font-medium">
+                <ShieldCheck className="w-4 h-4 text-primary" /> 100% Verified Info
+              </div>
+            </div>
+          </div>
+          <div className="w-full md:w-1/3 flex justify-center">
+             <Button onClick={handleAction} size="lg" className="rounded-full px-8 py-8 text-lg font-bold shadow-xl hover:scale-105 transition-transform">
+                Book a Free Slot
+             </Button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

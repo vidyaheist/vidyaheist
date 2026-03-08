@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useUser, useFirestore } from "@/firebase";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import * as z from "zod";
 import { doc, getDoc, collection, getDocs, updateDoc, deleteDoc, writeBatch, serverTimestamp } from "firebase/firestore";
 
@@ -32,20 +32,20 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import type { TestSeriesFullType, AdminQuestionType, AdminOptionType } from "@/lib/types";
+import type { TestSeriesFullType, AdminQuestionType } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { ADMIN_EMAIL } from "@/lib/constants";
 
 const testSeriesSchema = z.object({
-  name: z.string().min(5, { message: "Test series name must be at least 5 characters." }),
+  name: z.string().min(5, { message: "Course name must be at least 5 characters." }),
   description: z.string().optional(),
   price: z.coerce.number().min(0, { message: "Price must be a positive number or zero." }),
-  subject: z.string().min(3, { message: "Subject is required." }),
+  subject: z.string().min(3, { message: "Exam category is required." }),
   numberOfTests: z.coerce.number().optional().nullable(),
   durationPerTest: z.coerce.number().optional().nullable(),
   imageUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal('')),
@@ -83,7 +83,7 @@ function QuestionEditForm({ questionData, onSave, onCancel, formInstance }: Ques
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = formInstance;
 
   const { fields } = useFieldArray({
@@ -93,13 +93,6 @@ function QuestionEditForm({ questionData, onSave, onCancel, formInstance }: Ques
 
   const watchedOptions = watch("options");
   const watchedCorrectOptionId = watch("correctOptionId");
-
-  useEffect(() => {
-    const currentCorrectOption = watchedOptions.find(opt => opt.id === watchedCorrectOptionId);
-    if (!currentCorrectOption && watchedOptions.length > 0) {
-      // Logic to handle if correct option is removed, currently no remove option button here
-    }
-  }, [watchedOptions, watchedCorrectOptionId, setValue]);
 
   const onSubmit = async (data: QuestionEditFormValues) => {
     if (!data.options.find(opt => opt.id === data.correctOptionId)) {
@@ -183,8 +176,6 @@ function QuestionEditForm({ questionData, onSave, onCancel, formInstance }: Ques
                 </Card>
                 ))}
             </RadioGroup>
-            {errors.correctOptionId && <FormMessage>{errors.correctOptionId.message}</FormMessage>}
-            {errors.options?.root && <FormMessage>{errors.options.root.message}</FormMessage>}
         </FormItem>
 
         <div className="flex justify-end space-x-3">
@@ -219,8 +210,6 @@ export default function EditQuizPage() {
   const { toast } = useToast();
   const seriesId = params.id as string;
 
-  const adminUIDFromEnv = process.env.NEXT_PUBLIC_ADMIN_UID;
-
   const testSeriesEditForm = useForm<TestSeriesFormValues>({
     resolver: zodResolver(testSeriesSchema),
   });
@@ -244,7 +233,7 @@ export default function EditQuizPage() {
       const seriesDocRef = doc(firestore, "testSeries", id);
       const seriesSnap = await getDoc(seriesDocRef);
 
-      if (!seriesSnap.exists()) throw new Error("Test series not found.");
+      if (!seriesSnap.exists()) throw new Error("Course not found.");
       
       const seriesData = { id: seriesSnap.id, ...seriesSnap.data() } as TestSeriesFullType;
 
@@ -268,8 +257,8 @@ export default function EditQuizPage() {
       });
 
     } catch (error: any) {
-      console.error("Error fetching test series details:", error);
-      toast({ title: "Error", description: "Failed to load test series data.", variant: "destructive" });
+      console.error("Error fetching course details:", error);
+      toast({ title: "Error", description: "Failed to load course data.", variant: "destructive" });
       router.push("/store"); 
     } finally {
         setLoading(false);
@@ -283,7 +272,7 @@ export default function EditQuizPage() {
         router.push("/login");
         return;
       }
-      if (user.uid && adminUIDFromEnv && user.uid === adminUIDFromEnv) {
+      if (user.email === ADMIN_EMAIL) {
         setIsAdmin(true);
         if (seriesId) {
           fetchTestSeriesAndQuestions(seriesId);
@@ -292,12 +281,12 @@ export default function EditQuizPage() {
         setIsAdmin(false);
       }
     }
-  }, [user, userLoading, adminUIDFromEnv, seriesId, fetchTestSeriesAndQuestions, router]);
+  }, [user, userLoading, seriesId, fetchTestSeriesAndQuestions, router]);
 
 
   async function onTestSeriesUpdate(data: TestSeriesFormValues) {
-    if (!user || !adminUIDFromEnv || !seriesId || !firestore) {
-      toast({ title: "Error", description: "Admin user or Test Series ID not identified.", variant: "destructive" });
+    if (!user || !isAdmin || !seriesId || !firestore) {
+      toast({ title: "Error", description: "Admin authentication required.", variant: "destructive" });
       return;
     }
     try {
@@ -307,22 +296,21 @@ export default function EditQuizPage() {
         updatedAt: serverTimestamp(),
       });
 
-      toast({ title: "Success", description: `Test Series "${data.name}" updated successfully!` });
+      toast({ title: "Success", description: `Course "${data.name}" updated successfully!` });
     } catch (error: any) {
-      console.error("Error updating test series:", error);
-      toast({ title: "Error", description: error.message || "Failed to update test series.", variant: "destructive" });
+      console.error("Error updating course:", error);
+      toast({ title: "Error", description: error.message || "Failed to update course.", variant: "destructive" });
     }
   }
 
   async function handleDeleteTestSeries() {
     if (!seriesId || !isAdmin || !firestore) {
-        toast({ title: "Error", description: "Cannot delete test series.", variant: "destructive" });
+        toast({ title: "Error", description: "Cannot delete course.", variant: "destructive" });
         return;
     }
     setIsDeletingSeries(true);
     try {
         const seriesDocRef = doc(firestore, "testSeries", seriesId);
-        // First, delete all questions in the subcollection
         const questionsQuery = collection(firestore, "testSeries", seriesId, "questions");
         const questionsSnap = await getDocs(questionsQuery);
         const batch = writeBatch(firestore);
@@ -331,14 +319,13 @@ export default function EditQuizPage() {
         });
         await batch.commit();
 
-        // Then delete the test series document itself
         await deleteDoc(seriesDocRef);
 
-        toast({ title: "Success", description: "Test Series deleted successfully." });
+        toast({ title: "Success", description: "Course deleted successfully." });
         router.push("/store");
     } catch (error: any) {
-        console.error("Error deleting test series:", error);
-        toast({ title: "Error", description: error.message || "Failed to delete test series.", variant: "destructive" });
+        console.error("Error deleting course:", error);
+        toast({ title: "Error", description: error.message || "Failed to delete course.", variant: "destructive" });
     } finally {
         setIsDeletingSeries(false);
     }
@@ -411,7 +398,7 @@ export default function EditQuizPage() {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="ml-4 text-lg">Verifying access and loading data...</p>
+        <p className="ml-4 text-lg">Verifying access...</p>
       </div>
     );
   }
@@ -440,9 +427,9 @@ export default function EditQuizPage() {
      return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)]">
         <ShieldAlert className="h-12 w-12 text-destructive mb-4" />
-        <p className="text-xl text-destructive mb-2">Test Series Not Found</p>
-        <p className="text-muted-foreground mb-6">The requested test series could not be loaded or does not exist.</p>
-        <Button onClick={() => router.push("/store")} variant="outline">Back to Store</Button>
+        <p className="text-xl text-destructive mb-2">Course Not Found</p>
+        <p className="text-muted-foreground mb-6">The requested course could not be loaded or does not exist.</p>
+        <Button onClick={() => router.push("/store")} variant="outline">Back to Courses</Button>
       </div>
     );
   }
@@ -451,7 +438,7 @@ export default function EditQuizPage() {
      return (
       <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="ml-4 text-lg">Loading test series details...</p>
+        <p className="ml-4 text-lg">Loading course details...</p>
       </div>
     );
   }
@@ -459,7 +446,7 @@ export default function EditQuizPage() {
   return (
     <div className="space-y-8">
       <section className="text-center py-8 bg-primary/5 rounded-lg">
-        <h1 className="text-4xl font-bold tracking-tight text-primary">Edit Test Series & Questions</h1>
+        <h1 className="text-4xl font-bold tracking-tight text-primary">Edit Course & Questions</h1>
         <p className="mt-2 text-lg text-muted-foreground">
           Modifying: {testSeriesData.name}
         </p>
@@ -467,8 +454,8 @@ export default function EditQuizPage() {
 
       <Card className="shadow-xl">
         <CardHeader>
-          <CardTitle>Test Series Details</CardTitle>
-          <CardDescription>Update the information for this test series.</CardDescription>
+          <CardTitle>Course Details</CardTitle>
+          <CardDescription>Update the core information for this exam module.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...testSeriesEditForm}>
@@ -478,8 +465,8 @@ export default function EditQuizPage() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Test Series Name</FormLabel>
-                      <FormControl><Input placeholder="e.g., JEE Main Full Syllabus Mock 1" {...field} /></FormControl>
+                      <FormLabel>Course Name</FormLabel>
+                      <FormControl><Input placeholder="e.g., IAT Mock Exam Pack" {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -490,7 +477,7 @@ export default function EditQuizPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Description (Optional)</FormLabel>
-                      <FormControl><Textarea placeholder="A brief description of the test series" {...field} /></FormControl>
+                      <FormControl><Textarea placeholder="Course description..." {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -512,13 +499,12 @@ export default function EditQuizPage() {
                     name="subject"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Subject / Category</FormLabel>
+                        <FormLabel>Exam Category</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl><SelectTrigger><SelectValue placeholder="Select subject" /></SelectTrigger></FormControl>
+                          <FormControl><SelectTrigger><SelectValue placeholder="Select exam" /></SelectTrigger></FormControl>
                           <SelectContent>
-                            <SelectItem value="JEE Main">JEE Main</SelectItem>
-                            <SelectItem value="JEE Advanced">JEE Advanced</SelectItem>
-                            <SelectItem value="NEET UG">NEET UG</SelectItem>
+                            <SelectItem value="IAT">IAT (IISER Aptitude Test)</SelectItem>
+                            <SelectItem value="NEST">NEST (NISER/UM-DAE CEBS)</SelectItem>
                             <SelectItem value="General Aptitude">General Aptitude</SelectItem>
                             <SelectItem value="Other">Other (Specify)</SelectItem>
                           </SelectContent>
@@ -529,7 +515,7 @@ export default function EditQuizPage() {
                             name="subject" 
                             render={({ field: otherField }) => (
                               <Input 
-                                placeholder="Specify other subject" 
+                                placeholder="Specify other exam" 
                                 className="mt-2" 
                                 {...otherField}
                                 onChange={(e) => otherField.onChange(e.target.value)}
@@ -573,7 +559,7 @@ export default function EditQuizPage() {
                         <FormItem>
                         <FormLabel>Image URL (Optional)</FormLabel>
                         <FormControl><Input type="url" placeholder="https://example.com/image.png" {...field} /></FormControl>
-                        <FormDescription>Paste a URL to an image for the test series.</FormDescription>
+                        <FormDescription>Course banner image.</FormDescription>
                         <FormMessage />
                         </FormItem>
                     )}
@@ -584,8 +570,8 @@ export default function EditQuizPage() {
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel>Image Placeholder Hint (Optional)</FormLabel>
-                        <FormControl><Input placeholder="e.g., 'jee exam' or 'medical study'" {...field} value={field.value ?? ''} /></FormControl>
-                        <FormDescription>Keywords for finding a placeholder image if URL is not provided (max 2 words).</FormDescription>
+                        <FormControl><Input placeholder="e.g., 'exam prep'" {...field} value={field.value ?? ''} /></FormControl>
+                        <FormDescription>Keywords for AI image generation fallback.</FormDescription>
                         <FormMessage />
                         </FormItem>
                     )}
@@ -593,21 +579,21 @@ export default function EditQuizPage() {
               <div className="flex flex-col sm:flex-row justify-between gap-4">
                 <Button type="submit" className="w-full sm:w-auto" disabled={testSeriesEditForm.formState.isSubmitting}>
                   {testSeriesEditForm.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Update Test Series Details
+                  Update Course Details
                 </Button>
 
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
                         <Button variant="destructive" className="w-full sm:w-auto" disabled={isDeletingSeries}>
                             <Trash2 className="mr-2 h-4 w-4" />
-                            {isDeletingSeries ? 'Deleting...' : 'Delete Entire Test Series'}
+                            {isDeletingSeries ? 'Deleting...' : 'Delete Course'}
                         </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete this test series
+                            This action cannot be undone. This will permanently delete this course
                             and all its associated questions.
                         </AlertDialogDescription>
                         </AlertDialogHeader>
@@ -615,7 +601,7 @@ export default function EditQuizPage() {
                         <AlertDialogCancel disabled={isDeletingSeries}>Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={handleDeleteTestSeries} disabled={isDeletingSeries} className="bg-destructive hover:bg-destructive/90">
                             {isDeletingSeries ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            Yes, delete series
+                            Yes, delete course
                         </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
@@ -634,7 +620,7 @@ export default function EditQuizPage() {
                 <PlusCircle className="mr-2 h-4 w-4" /> Add New Question
             </Button>
           </div>
-          <CardDescription>Edit or delete questions for this test series.</CardDescription>
+          <CardDescription>Edit or delete questions for this exam.</CardDescription>
         </CardHeader>
         <CardContent>
           {testSeriesData.questions && testSeriesData.questions.length > 0 ? (
@@ -718,24 +704,9 @@ export default function EditQuizPage() {
             </div>
           ) : (
             <p className="mt-4 text-muted-foreground text-center py-6">
-              No questions have been added to this test series yet.
+              No questions have been added yet.
             </p>
           )}
-        </CardContent>
-      </Card>
-
-
-      <Card className="mt-8 shadow-md">
-        <CardHeader>
-            <CardTitle>Admin Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-            <p className="text-sm text-muted-foreground">
-                Admin UID: {adminUIDFromEnv || "NOT SET"}.
-            </p>
-             <p className="text-xs text-muted-foreground mt-1">
-                Editing Test Series ID: {seriesId}
-            </p>
         </CardContent>
       </Card>
     </div>

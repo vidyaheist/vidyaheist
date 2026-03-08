@@ -1,14 +1,39 @@
 'use client';
 
 import { createContext, useContext } from 'react';
-import type { FirebaseApp } from 'firebase/app';
-import type { Auth } from 'firebase/auth';
-import type { Firestore } from 'firebase/firestore';
+import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
+import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getAuth, type Auth } from 'firebase/auth';
+import { firebaseConfig } from './config';
+
+// Prevent multiple instances of Firebase
+function getFirebaseInstances() {
+  if (!getApps().length) {
+    const firebaseApp = initializeApp(firebaseConfig);
+    const firestore = getFirestore(firebaseApp);
+    const auth = getAuth(firebaseApp);
+    return { firebaseApp, firestore, auth };
+  } else {
+    const firebaseApp = getApps()[0];
+    const firestore = getFirestore(firebaseApp);
+    const auth = getAuth(firebaseApp);
+    return { firebaseApp, firestore, auth };
+  }
+}
+
+// Main initialization function for server components or layout
+export const initializeFirebase = (): {
+  firebaseApp: FirebaseApp;
+  firestore: Firestore;
+  auth: Auth;
+} => {
+  return getFirebaseInstances();
+};
 
 export interface FirebaseContextValue {
   firebaseApp: FirebaseApp | null;
   firestore: Firestore | null;
-  auth: Auth | null;
+  auth: null | Auth;
 }
 
 export const FirebaseContext = createContext<FirebaseContextValue>({

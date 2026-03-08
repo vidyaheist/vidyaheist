@@ -1,6 +1,5 @@
-
 import Link from "next/link";
-import { BookOpenText, Facebook, Twitter, Linkedin, Instagram, Youtube } from "lucide-react";
+import { Facebook, Twitter, Linkedin, Instagram, Youtube } from "lucide-react";
 import Image from "next/image";
 import { APP_NAME } from "@/lib/constants";
 
@@ -11,18 +10,16 @@ export function Footer() {
     <footer className="border-t bg-card text-card-foreground">
       <div className="container py-12 px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-          {/* Column 1: App Info */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center space-x-2">
-                 <Image src="/logo.jpeg" alt="Vidyaheist Logo" width={32} height={32} className="rounded-sm" />
+                 <Image src="/logo.jpeg" alt={`${APP_NAME} Logo`} width={32} height={32} className="rounded-sm" />
                  <span className="text-2xl font-bold">{APP_NAME}</span>
             </Link>
             <p className="text-sm text-muted-foreground">
-              Your partner in acing competitive exams with realistic simulations and AI-powered insights.
+              Your partner in acing top research exams.
             </p>
           </div>
 
-          {/* Column 2: Quick Links */}
           <div className="space-y-3">
             <h4 className="text-lg font-semibold">Quick Links</h4>
             <ul className="space-y-2 text-sm">
@@ -33,7 +30,6 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Resources & Legal */}
           <div className="space-y-3">
             <h4 className="text-lg font-semibold">Resources</h4>
             <ul className="space-y-2 text-sm">
@@ -44,17 +40,10 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Follow Us */}
           <div className="space-y-3">
             <h4 className="text-lg font-semibold">Follow Us</h4>
             <div className="flex space-x-4">
-              <Link href="#" aria-label="Facebook" className="text-muted-foreground hover:text-primary transition-colors">
-                <Facebook className="h-6 w-6" />
-              </Link>
-              <Link href="#" aria-label="Twitter" className="text-muted-foreground hover:text-primary transition-colors">
-                <Twitter className="h-6 w-6" />
-              </Link>
-              <Link href="#" aria-label="LinkedIn" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link href="#" aria-label="Linkedin" className="text-muted-foreground hover:text-primary transition-colors">
                 <Linkedin className="h-6 w-6" />
               </Link>
               <Link href="#" aria-label="Instagram" className="text-muted-foreground hover:text-primary transition-colors">

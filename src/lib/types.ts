@@ -28,8 +28,8 @@ export type TestSeriesType = {
   questions?: QuestionType[];
   data_ai_hint?: string | null;
   createdBy?: string | null;
-  createdAt?: any; // Allow server timestamp
-  updatedAt?: any; // Allow server timestamp
+  createdAt?: any; 
+  updatedAt?: any; 
 };
 
 export type UserAnswer = {
@@ -61,4 +61,17 @@ export type AdminQuestionType = {
 
 export type TestSeriesFullType = TestSeriesType & {
   questions?: AdminQuestionType[];
+};
+
+export type PurchaseType = {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  seriesId: string;
+  seriesName: string;
+  amount: number;
+  utr: string;
+  status: 'pending' | 'verified' | 'rejected';
+  createdAt: any;
 };

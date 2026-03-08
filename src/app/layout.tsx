@@ -1,4 +1,3 @@
-
 import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google'; // Using Inter as a common clean sans-serif
 import './globals.css';
@@ -13,6 +12,7 @@ import { APP_NAME } from '@/lib/constants';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
+import { FloatingContact } from '@/components/shared/FloatingContact';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -58,6 +58,7 @@ export default function RootLayout({
             <Footer />
             <Toaster />
             <FirebaseErrorListener />
+            <FloatingContact />
           </FirebaseClientProvider>
         </ThemeProvider>
       </body>
