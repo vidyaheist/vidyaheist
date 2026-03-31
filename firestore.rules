@@ -52,5 +52,21 @@ service cloud.firestore {
       allow create: if isUserAuthenticated();
       allow update, delete: if isAdmin();
     }
+
+    // Results collection - Students save their final score
+    match /results/{resultId} {
+      // Allowing read for all authenticated users for the leaderboard
+      allow read: if isUserAuthenticated();
+      // Only owner can create it
+      allow create: if isUserAuthenticated() && request.resource.data.userId == request.auth.uid;
+      // Only owner can perform other operations (though we mostly only need read/create)
+      allow update, delete: if isUserAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // Exam progress - Periodic auto-saves while taking the test
+    match /examProgress/{progressId} {
+      // progressId is {userId}_{testId}
+      allow read, write: if isUserAuthenticated() && (progressId.split('_')[0] == request.auth.uid);
+    }
   }
 }

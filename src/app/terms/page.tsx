@@ -1,102 +1,48 @@
-
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { APP_NAME } from "@/lib/constants";
-import { Mail, Phone } from "lucide-react";
 
 export default function TermsPage() {
-  const sections = [
-    {
-      title: "1. Introduction",
-      content: `${APP_NAME} provides educational services including personalized courses, test series, mentorship programs, and college counselling designed to help students pursue careers in research and higher education. By using the ${APP_NAME} website or services, you acknowledge that you have read, understood, and accepted these Terms and Conditions.`
-    },
-    {
-      title: "2. Use of the Platform",
-      content: "Users of the Vidyaheist platform agree to use the website and services responsibly and for educational purposes only. You agree that you will not: Use the website for unlawful activities; Attempt to disrupt or damage the functioning of the platform; Gain unauthorized access to any part of the website or its systems. Vidyaheist reserves the right to suspend or terminate access to the platform if any misuse is detected."
-    },
-    {
-      title: "3. User Registration and Information",
-      content: "To access certain services such as courses or test series, users may be required to provide personal details including name, email address, and phone number. By registering, you agree that information provided is accurate, you are responsible for maintaining credential confidentiality, and any activity occurring through your account is your responsibility."
-    },
-    {
-      title: "4. Educational Services",
-      content: "Vidyaheist provides various academic services including online courses, test series, performance analysis, mentorship, and college counselling. These are designed to support students in their academic preparation. However, Vidyaheist does not guarantee specific academic outcomes, exam results, or admissions."
-    },
-    {
-      title: "5. Intellectual Property",
-      content: "All content available on the Vidyaheist platform including study materials, videos, lectures, test questions, graphics, and design are the intellectual property of Vidyaheist. Users are strictly prohibited from copying, redistributing, sharing login credentials, or uploading material to other platforms."
-    },
-    {
-      title: "6. Payments and Access",
-      content: "Some services require payment. By purchasing, you agree to the listed price and terms. Access to digital content is provided after successful payment verification. Course access duration may vary. Vidyaheist reserves the right to modify pricing or services at any time."
-    },
-    {
-      title: "7. Communication Policy",
-      content: "By submitting contact details, you consent to receive communication regarding courses, test series, mentorship, and academic updates via phone, SMS, email, or WhatsApp. This may occur even if your number is registered under DND (Do Not Disturb)."
-    },
-    {
-      title: "8. Third-Party Links",
-      content: "The website may contain links to external websites. Vidyaheist is not responsible for the content, privacy practices, or accuracy of third-party platforms. Users access these at their own risk."
-    },
-    {
-      title: "9. Limitation of Liability",
-      content: "Vidyaheist will not be liable for any direct, indirect, incidental, or consequential damages arising from use or inability to use the website, technical errors, or unauthorized access. All services are provided on an 'as available' basis."
-    },
-    {
-      title: "10. Changes to Terms",
-      content: "Vidyaheist reserves the right to update or modify these Terms and Conditions at any time. Continued use of the website after changes indicates acceptance of the revised terms."
-    },
-    {
-      title: "11. Governing Law",
-      content: "These Terms and Conditions are governed by the laws of India. Any disputes shall be subject to the jurisdiction of the appropriate courts in India."
-    }
-  ];
-
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-primary mb-4">Terms and Conditions</h1>
-        <p className="text-muted-foreground">Welcome to {APP_NAME}. Please read these terms carefully.</p>
-      </div>
-
-      <Card className="shadow-xl">
-        <CardContent className="p-8">
-          <div className="space-y-8">
-            {sections.map((section, idx) => (
-              <section key={idx} className="space-y-3">
-                <h2 className="text-xl font-bold text-primary">{section.title}</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  {section.content}
-                </p>
-              </section>
-            ))}
-
-            <section className="space-y-4 pt-6 border-t">
-              <h2 className="text-xl font-bold text-primary">12. Contact Information</h2>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 p-4 bg-secondary/30 rounded-lg">
-                  <Mail className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="text-xs font-semibold text-muted-foreground uppercase">Email Us</p>
-                    <p className="font-medium">team.vidyaheist@gmail.com</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-4 bg-secondary/30 rounded-lg">
-                  <Phone className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="text-xs font-semibold text-muted-foreground uppercase">Call Us</p>
-                    <p className="font-medium">+91 7206150973</p>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </div>
+    <div className="max-w-4xl mx-auto py-12 px-4 animate-in fade-in duration-700">
+      <Card className="shadow-xl bg-card border-2 border-primary/5">
+        <CardHeader className="bg-primary/5 border-b py-8">
+          <CardTitle className="text-3xl font-black text-center text-primary">Terms & Conditions</CardTitle>
+        </CardHeader>
+        <CardContent className="p-8 prose prose-slate max-w-none text-muted-foreground leading-relaxed">
+          <p>This document is an electronic record in terms of Information Technology Act, 2000 and rules there under as applicable and the amended provisions pertaining to electronic records in various statutes as amended by the Information Technology Act, 2000. This electronic record is generated by a computer system and does not require any physical or digital signatures.</p>
+          
+          <p>This document is published in accordance with the provisions of Rule 3 (1) of the Information Technology (Intermediaries guidelines) Rules, 2011 that require publishing the rules and regulations, privacy policy and Terms of Use for access or usage of domain name <a href="https://vidyaheist.in/" className="text-primary font-bold">https://vidyaheist.in/</a> ('Website'), including the related mobile site and mobile application (hereinafter referred to as 'Platform').</p>
+          
+          <p>The Platform is owned by <strong>7206150973</strong>, a company incorporated under the Companies Act, 1956 with its registered office at <strong>JIND , hARYANA</strong> (hereinafter referred to as ‘Platform Owner’, 'we', 'us', 'our')..</p>
+          
+          <p>Your use of the Platform and services and tools are governed by the following terms and conditions (“Terms of Use”) as applicable to the Platform including the applicable policies which are incorporated herein by way of reference. If You transact on the Platform, You shall be subject to the policies that are applicable to the Platform for such transaction. By mere use of the Platform, You shall be contracting with the Platform Owner and these terms and conditions including the policies constitute Your binding obligations, with Platform Owner. These Terms of Use relate to your use of our website, goods (as applicable) or services (as applicable) (collectively, 'Services'). Any terms and conditions proposed by You which are in addition to or which conflict with these Terms of Use are expressly rejected by the Platform Owner and shall be of no force or effect. These Terms of Use can be modified at any time without assigning any reason. It is your responsibility to periodically review these Terms of Use to stay informed of updates..</p>
+          
+          <p>For the purpose of these Terms of Use, wherever the context so requires ‘you’, 'your' or ‘user’ shall mean any natural or legal person who has agreed to become a user/buyer on the Platform..</p>
+          
+          <p className="font-bold text-foreground">ACCESSING, BROWSING OR OTHERWISE USING THE PLATFORM INDICATES YOUR AGREEMENT TO ALL THE TERMS AND CONDITIONS UNDER THESE TERMS OF USE, SO PLEASE READ THE TERMS OF USE CAREFULLY BEFORE PROCEEDING..</p>
+          
+          <p>The use of Platform and/or availing of our Services is subject to the following Terms of Use:</p>
+          
+          <ol className="space-y-4">
+            <li>To access and use the Services, you agree to provide true, accurate and complete information to us during and after registration, and you shall be responsible for all acts done through the use of your registered account on the Platform..</li>
+            <li>Neither we nor any third parties provide any warranty or guarantee as to the accuracy, timeliness, performance, completeness or suitability of the information and materials offered on this website or through the Services, for any specific purpose. You acknowledge that such information and materials may contain inaccuracies or errors and we expressly exclude liability for any such inaccuracies or errors to the fullest extent permitted by law..</li>
+            <li>Your use of our Services and the Platform is solely and entirely at your own risk and discretion for which we shall not be liable to you in any manner. You are required to independently assess and ensure that the Services meet your requirements..</li>
+            <li>The contents of the Platform and the Services are proprietary to us and are licensed to us. You will not have any authority to claim any intellectual property rights, title, or interest in its contents. The contents includes and is not limited to the design, layout, look and graphics..</li>
+            <li>You acknowledge that unauthorized use of the Platform and/or the Services may lead to action against you as per these Terms of Use and/or applicable laws..</li>
+            <li>You agree to pay us the charges associated with availing the Services..</li>
+            <li>You agree not to use the Platform and/ or Services for any purpose that is unlawful, illegal or forbidden by these Terms, or Indian or local laws that might apply to you.</li>
+            <li>You agree and acknowledge that website and the Services may contain links to other third party websites. On accessing these links, you will be governed by the terms of use, privacy policy and such other policies of such third party websites. These links are provided for your convenience for provide further information..</li>
+            <li>You understand that upon initiating a transaction for availing the Services you are entering into a legally binding and enforceable contract with the Platform Owner for the Services..</li>
+            <li>You shall indemnify and hold harmless Platform Owner, its affiliates, group companies (as applicable) and their respective officers, directors, agents, and employees, from any claim or demand, or actions including reasonable attorney's fees, made by any third party or penalty imposed due to or arising out of Your breach of this Terms of Use, privacy Policy and other Policies, or Your violation of any law, rules or regulations or the rights (including infringement of intellectual property rights) of a third party.</li>
+            <li>Notwithstanding anything contained in these Terms of Use, the parties shall not be liable for any failure to perform an obligation under these Terms if performance is prevented or delayed by a force majeure event..</li>
+            <li>These Terms and any dispute or claim relating to it, or its enforceability, shall be governed by and construed in accordance with the laws of India..</li>
+            <li>All disputes arising out of or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts in JIND and Haryana.</li>
+            <li>All concerns or communications relating to these Terms must be communicated to us using the contact information provided on this website</li>
+          </ol>
         </CardContent>
       </Card>
     </div>
   );
 }
-
-    

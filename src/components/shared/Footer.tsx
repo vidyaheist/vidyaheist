@@ -1,10 +1,19 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Facebook, Twitter, Linkedin, Instagram, Youtube } from "lucide-react";
 import Image from "next/image";
 import { APP_NAME } from "@/lib/constants";
 
 export function Footer() {
+  const pathname = usePathname();
   const currentYear = new Date().getFullYear();
+
+  const showFooterPaths = ["/", "/dashboard", "/profile"];
+  const shouldShowFooter = showFooterPaths.includes(pathname);
+
+  if (!shouldShowFooter) return null;
 
   return (
     <footer className="border-t bg-card text-card-foreground">
@@ -31,12 +40,13 @@ export function Footer() {
           </div>
 
           <div className="space-y-3">
-            <h4 className="text-lg font-semibold">Resources</h4>
+            <h4 className="text-lg font-semibold">Compliance</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/faq" className="text-muted-foreground hover:text-primary transition-colors">FAQ</Link></li>
-              <li><Link href="/blog" className="text-muted-foreground hover:text-primary transition-colors">Blog</Link></li>
               <li><Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link></li>
+              <li><Link href="/refund" className="text-muted-foreground hover:text-primary transition-colors">Refund & Cancellation</Link></li>
+              <li><Link href="/shipping" className="text-muted-foreground hover:text-primary transition-colors">Shipping Policy</Link></li>
+              <li><Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contact Us</Link></li>
             </ul>
           </div>
 

@@ -2,12 +2,16 @@
 
 import { useUser } from "@/firebase";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, BarChart2, BookOpenCheck, GitBranch, User } from "lucide-react";
+import { Loader2, BookOpenCheck, User, TrendingUp, Award } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useUserAnalytics } from "@/hooks/useUserAnalytics";
+import { ActivityFeed } from "@/components/shared/analytics/ActivityFeed";
+import { Badge } from "@/components/ui/badge";
 
 export default function DashboardPage() {
   const { user, loading } = useUser();
+  const { recentActivity, stats, isLoading: analyticsLoading } = useUserAnalytics();
 
   if (loading) {
     return (
@@ -39,21 +43,25 @@ export default function DashboardPage() {
     },
     {
       title: "Check Your Rank",
-      description: "Use our predictor tool to estimate your rank. (Coming Soon!)",
-      href: "/predictor",
-      icon: <GitBranch className="w-8 h-8 text-primary" />,
+      description: stats.totalTests > 0 
+        ? `You currently have # ${recentActivity[0]?.rank || '-'} rank in your last attempt.` 
+        : "Complete a test to see your global ranking.",
+      href: "/profile",
+      icon: <Award className="w-8 h-8 text-secondary" />,
     },
     {
       title: "Performance Analytics",
-      description: "Dive deep into your results and track your progress. (Coming Soon!)",
+      description: stats.totalTests > 0 
+        ? `Consistency: ${Math.round(stats.avgScore)}% accuracy across ${stats.totalTests} tests.` 
+        : "Unlock deep performance insights after your first test.",
       href: "/profile",
-      icon: <BarChart2 className="w-8 h-8 text-primary" />,
+      icon: <TrendingUp className="w-8 h-8 text-primary" />,
     },
      {
       title: "Manage Profile",
-      description: "Update your personal details and password.",
+      description: "Update your personal details, profile picture, and security.",
       href: "/profile",
-      icon: <User className="w-8 h-8 text-primary" />,
+      icon: <User className="w-8 h-8 text-muted-foreground" />,
     },
   ];
 
@@ -86,18 +94,22 @@ export default function DashboardPage() {
         ))}
       </div>
 
-       <Card>
-        <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>An overview of your recent tests and performance.</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <div className="text-center py-12 text-muted-foreground">
-                <p>You haven't taken any tests yet.</p>
-                <Button asChild variant="link" className="mt-2">
-                    <Link href="/store">Explore Test Series</Link>
-                </Button>
+       <Card className="shadow-xl bg-card border-2 border-primary/5">
+        <CardHeader className="flex flex-row items-center justify-between border-b py-6">
+            <div>
+                <CardTitle className="text-2xl font-black">Recent Activity</CardTitle>
+                <CardDescription>Track your journey and performance overview.</CardDescription>
             </div>
+            {stats.totalTests > 0 && <Badge variant="secondary" className="px-4 py-1.5 rounded-full font-bold">{stats.totalTests} Tests Completed</Badge>}
+        </CardHeader>
+        <CardContent className="pt-8">
+            {analyticsLoading ? (
+                <div className="py-20 flex justify-center items-center gap-4 text-muted-foreground italic">
+                    <Loader2 className="animate-spin h-6 w-6" /> Calculating data...
+                </div>
+            ) : (
+                <ActivityFeed activities={recentActivity} />
+            )}
         </CardContent>
        </Card>
     </div>

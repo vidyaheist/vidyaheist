@@ -27,35 +27,54 @@ const GenerateExplanationOutputSchema = z.object({
 
 export type GenerateExplanationOutput = z.infer<typeof GenerateExplanationOutputSchema>;
 
-export async function generateExplanation(input: GenerateExplanationInput): Promise<GenerateExplanationOutput> {
+export async function generateExplanation(input: GenerateExplanationInput) {
   return generateExplanationFlow(input);
 }
 
 const prompt = ai.definePrompt({
   name: 'generateExplanationPrompt',
   input: {schema: GenerateExplanationInputSchema},
-  output: {schema: GenerateExplanationOutputSchema},
-  prompt: `You are an AI expert in generating detailed explanations for students who have answered questions incorrectly. Your goal is to help them understand their mistakes and learn the underlying concepts.
-
-  Here is the question, the student's answer, and the correct answer:
+  prompt: `You are a world-class academic tutor. Your goal is to provide a structured, step-by-step pedagogical explanation for a student who has answered a question incorrectly.
 
   Topic: {{{topic}}}
   Question: {{{question}}}
   Student's Answer: {{{studentAnswer}}}
   Correct Answer: {{{correctAnswer}}}
 
-  Provide a clear and concise explanation of why the student's answer was incorrect and why the correct answer is correct. Focus on the specific misunderstanding that led to the incorrect answer.
+  Your explanation MUST be formatted in Markdown with the following sections:
+
+  ### 1. Concept Overview 📖
+  Briefly explain the core scientific/mathematical principle involved in this question. Use LaTeX for formulas where appropriate.
+
+  ### 2. Step-by-Step Solution 🧠
+  Break down the logic required to reach the correct answer. Use bullet points and ensure LaTeX formulas (if any) are correctly formatted (e.g., $$E = mc^2$$).
+
+  ### 3. Why the Student's Answer is a Common Pitfall ⚠️
+  Analyze why a student might choose an incorrect option (e.g., miscalculation, wrong formula, or conceptual misunderstanding).
+
+  ### 4. Common Mistakes to Avoid 🚫
+  List 2-3 common traps or mistakes related to this topic.
+
+  ### 5. Fundamental Takeaway ✨
+  One sentence summarizing the key rule or concept to remember for future questions.
+
+  Use clear, encouraging language. Keep the explanation professional and concise.
   `,
 });
 
-const generateExplanationFlow = ai.defineFlow(
+export const generateExplanationFlow = ai.defineFlow(
   {
     name: 'generateExplanationFlow',
     inputSchema: GenerateExplanationInputSchema,
-    outputSchema: GenerateExplanationOutputSchema,
+    outputSchema: z.string(), // Stream string directly or return final
   },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  async (input, {sendChunk}) => {
+    const {response, stream} = await prompt.stream(input);
+    if (sendChunk) {
+        for await (const chunk of stream) {
+          sendChunk(chunk.text);
+        }
+    }
+    return (await response).text;
   }
 );

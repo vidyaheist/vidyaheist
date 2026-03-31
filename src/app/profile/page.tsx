@@ -13,8 +13,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Award, BarChart2, BookOpenCheck, Edit3, KeyRound, Loader2, User as UserIcon, Phone, Image as ImageIcon } from "lucide-react";
+import { Award, BarChart2, BookOpenCheck, Edit3, KeyRound, Loader2, User as UserIcon, Phone, Image as ImageIcon, Target, TrendingUp, History } from "lucide-react";
 import { formatDistanceToNow } from 'date-fns';
+import { useUserAnalytics } from "@/hooks/useUserAnalytics";
+import { PerformanceTrend } from "@/components/shared/analytics/PerformanceTrend";
+import { Badge } from "@/components/ui/badge";
 import {
   Form,
   FormControl,
@@ -55,6 +58,7 @@ type EditProfileFormValues = z.infer<typeof editProfileSchema>;
 
 export default function ProfilePage() {
   const { user, loading: userLoading } = useUser();
+  const { stats, chartData, results, isLoading: analyticsLoading } = useUserAnalytics();
   const auth = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
@@ -273,15 +277,39 @@ export default function ProfilePage() {
         <Separator />
 
         <CardContent className="pt-6 grid md:grid-cols-2 gap-8">
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-primary flex items-center">
-              <BarChart2 className="mr-2 h-5 w-5" /> Performance Overview
+          <div className="space-y-6">
+            <h3 className="text-xl font-bold text-primary flex items-center">
+              <BarChart2 className="mr-2 h-6 w-6" /> Performance Overview
             </h3>
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p>Tests Taken: Coming Soon</p>
-              <p>Average Score: Coming Soon</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-primary/5 p-4 rounded-xl border border-primary/10">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Tests Taken</p>
+                <div className="flex items-center gap-2">
+                    <History className="h-4 w-4 text-primary" />
+                    <span className="text-2xl font-black">{stats.totalTests}</span>
+                </div>
+              </div>
+              <div className="bg-primary/5 p-4 rounded-xl border border-primary/10">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Avg Accuracy</p>
+                <div className="flex items-center gap-2">
+                    <Target className="h-4 w-4 text-primary" />
+                    <span className="text-2xl font-black">{Math.round(stats.avgScore)}%</span>
+                </div>
+              </div>
             </div>
-            <Button variant="link" className="p-0 h-auto" disabled>View Detailed Analytics</Button>
+            
+            <div className="pt-4">
+                <h4 className="text-sm font-bold text-muted-foreground mb-4 uppercase tracking-widest flex items-center gap-2">
+                   <TrendingUp className="h-4 w-4" /> Growth Trend
+                </h4>
+                {analyticsLoading ? (
+                    <div className="h-[200px] flex items-center justify-center italic text-muted-foreground">
+                        <Loader2 className="animate-spin h-5 w-5 mr-2" /> Calculating trends...
+                    </div>
+                ) : (
+                    <PerformanceTrend data={chartData} />
+                )}
+            </div>
           </div>
 
           <div className="space-y-4">

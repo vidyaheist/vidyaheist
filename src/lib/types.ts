@@ -49,6 +49,7 @@ export type UserAnswer = {
   isMarkedForReview: boolean;
   isAnswered: boolean;
   visited: boolean;
+  explanation?: string; // Persistent AI-generated explanation
 };
 
 export type ExamPhase = 'instructions' | 'taking' | 'summary' | 'review' | 'loading' | 'error';
@@ -76,4 +77,27 @@ export type PurchaseType = {
   utr: string;
   status: 'pending' | 'verified' | 'rejected';
   createdAt: any;
+};
+
+export type TestResult = {
+  id: string;
+  userId: string;
+  userName: string;
+  testId: string;
+  testName: string;
+  seriesId: string;
+  score: number;
+  totalQuestions: number;
+  timeTaken: number; // in seconds
+  answers: { questionId: string; selectedOptionId: string | null }[];
+  createdAt: any;
+};
+
+export type ExamProgress = {
+  userId: string;
+  testId: string;
+  testName: string;
+  answers: { questionId: string; selectedOptionId: string | null; isMarkedForReview: boolean }[];
+  timeLeft: number;
+  updatedAt: any;
 };

@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, AlertCircle } from "lucide-react";
+import { MathText } from "@/components/shared/MathText";
 
 type ExplanationModalProps = {
   isOpen: boolean;
@@ -83,17 +84,17 @@ export function ExplanationModal({ isOpen, onClose, question, studentAnswer }: E
             <div className="space-y-4 my-4">
                 <div>
                     <h4 className="font-semibold text-lg mb-1">Question:</h4>
-                    <p className="text-muted-foreground">{question.text}</p>
+                    <div className="text-muted-foreground"><MathText text={question.text} /></div>
                 </div>
                 <div>
                     <h4 className="font-semibold text-lg mb-1">Your Answer:</h4>
-                    <p className={studentAnswer === correctAnswer ? "text-green-600" : "text-red-600"}>
-                        {studentAnswer || "Not Answered"}
-                    </p>
+                    <div className={studentAnswer === correctAnswer ? "text-green-600" : "text-red-600"}>
+                        <MathText text={studentAnswer || "Not Answered"} />
+                    </div>
                 </div>
                 <div>
                     <h4 className="font-semibold text-lg mb-1">Correct Answer:</h4>
-                    <p className="text-green-600">{correctAnswer}</p>
+                    <div className="text-green-600"><MathText text={correctAnswer || ""} /></div>
                 </div>
                 <hr/>
                 {isLoading && (
@@ -110,10 +111,11 @@ export function ExplanationModal({ isOpen, onClose, question, studentAnswer }: E
                     </Alert>
                 )}
                 {explanation && !isLoading && (
-                    <div>
+                    <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
                         <h4 className="font-semibold text-lg mb-2 text-primary">Detailed Explanation:</h4>
-                        <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed"
-                             dangerouslySetInnerHTML={{ __html: explanation.replace(/\n/g, '<br />') }} />
+                        <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
+                            <MathText text={explanation} />
+                        </div>
                     </div>
                 )}
             </div>
