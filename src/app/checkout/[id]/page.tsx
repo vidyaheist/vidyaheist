@@ -54,7 +54,11 @@ export default function CheckoutPage() {
       });
       
       const orderData = await orderRes.json();
-      if (!orderRes.ok) throw new Error(orderData.error || "Failed to create order");
+      if (!orderRes.ok) {
+        const error = new Error(orderData.error || "Failed to create order");
+        (error as any).details = orderData.details;
+        throw error;
+      }
       
       const orderId = orderData.order.id;
 
