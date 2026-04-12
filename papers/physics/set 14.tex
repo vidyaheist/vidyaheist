@@ -1,0 +1,233 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{physics}
+\usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc,angles,quotes,decorations.pathmorphing}
+\geometry{margin=1in}
+
+\setlist[enumerate,1]{label=\textbf{Q\arabic*.}}
+\setlist[enumerate,2]{label=(\Alph*)}
+
+\begin{document}
+
+\begin{center}
+\Large \textbf{Physics Paper (Ultra-Hard, 15 Questions, Fully Stabilized)}
+\end{center}
+
+\begin{enumerate}
+
+%=========================
+\item A bead of mass $m$ slides without friction on a circular hoop of radius $R$ fixed in a vertical plane. The hoop rotates with constant angular speed $\omega$ about its vertical diameter. For $\omega^2 > \dfrac{g}{R}$, two symmetric equilibrium positions appear. Determine the angular frequency of small oscillations about one stable equilibrium position.
+
+\begin{center}
+\begin{tikzpicture}[scale=1]
+\draw (0,0) circle (2);
+\draw[dashed] (0,-2)--(0,2);
+\fill (1.2,1.6) circle (2pt);
+\node[right] at (1.2,1.6) {$m$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}
+\item $\sqrt{\omega^2-\dfrac{g}{R}}$
+\item $\sqrt{2\omega^2-\dfrac{g}{R}}$
+\item $\sqrt{\omega^2+\dfrac{g}{R}}$
+\item $\sqrt{\dfrac{g}{R}}$
+\end{enumerate}
+
+%=========================
+\item A uniform rod of length $L$ and mass $m$ is hinged at one end and released from horizontal position. When the rod makes an angle $\theta$ with the vertical, determine the angular speed in terms of $g$, $L$ and $\theta$.
+
+\begin{tikzpicture}[scale=1]
+
+\coordinate (O) at (0,0);
+\coordinate (V) at (0,-3);   % vertical reference
+
+% Define theta (example visual angle only)
+\def\ang{35}
+
+% Rod position making angle theta with vertical
+\coordinate (P) at ({3*sin(\ang)},{-3*cos(\ang)});
+
+\draw (O)--(P);
+\fill (O) circle(2pt);
+
+\draw[dashed] (O)--(V);
+
+\draw pic [draw, "$\theta$", angle radius=0.7cm]
+{angle = V--O--P};
+
+\end{tikzpicture}
+
+\begin{enumerate}
+\item $\sqrt{\dfrac{3g}{L}(1-\cos\theta)}$
+\item $\sqrt{\dfrac{6g}{L}(1-\cos\theta)}$
+\item $\sqrt{\dfrac{3g}{2L}(1-\cos\theta)}$
+\item $\sqrt{\dfrac{2g}{L}(1-\cos\theta)}$
+\end{enumerate}
+
+%=========================
+\item A particle moves in central potential $V(r)=-\dfrac{k}{r}+\dfrac{\alpha}{2r^2}$ where $\alpha>0$. For given angular momentum $L$, determine condition for existence of circular orbit and its stability.
+
+\begin{enumerate}
+\item Exists for all $L$ and always stable
+\item Exists only if $L^2>m\alpha$ and always stable
+\item Exists only if $L^2>m\alpha$ and unstable
+\item Exists only if $L^2<m\alpha$
+\end{enumerate}
+
+%=========================
+\item A conducting rod of mass $m$ and resistance $R$ slides on frictionless rails separated by distance $l$ in uniform magnetic field $B$. The rails are connected by another resistor $R$. If the rod is given initial speed $v_0$, determine total distance travelled before coming to rest.
+
+\begin{center}
+\begin{tikzpicture}
+\draw (0,0)--(4,0);
+\draw (0,2)--(4,2);
+\draw (0,0)--(0,2);
+\draw (2,0)--(2,2);
+\node at (4.5,1) {$B\odot$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}
+\item $\dfrac{mRv_0}{B^2l^2}$
+\item $\dfrac{2mRv_0}{B^2l^2}$
+\item $\dfrac{mRv_0}{2B^2l^2}$
+\item $\dfrac{mRv_0^2}{B^2l^2}$
+\end{enumerate}
+
+%=========================
+\item A parallel plate capacitor of capacitance $C$ is charged to potential $V$ and disconnected. The separation between plates is doubled slowly without allowing charge leakage. Determine the final energy stored in terms of initial energy $U$.
+
+\begin{enumerate}
+\item $2U$
+\item $\dfrac{U}{2}$
+\item $U$
+\item $4U$
+\end{enumerate}
+
+%=========================
+\item A thin spherical conducting shell of radius $R$ carries charge $Q$. A point charge $q$ is placed at its centre. Determine change in electrostatic energy compared to isolated system.
+
+\begin{center}
+\begin{tikzpicture}
+\draw (0,0) circle(2);
+\fill (0,0) circle(2pt);
+\node at (0.3,0.3){$q$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}
+\item Increased by $\dfrac{qQ}{4\pi\epsilon_0R}$
+\item Decreased by $\dfrac{qQ}{4\pi\epsilon_0R}$
+\item Unchanged
+\item Increased by $\dfrac{q^2}{8\pi\epsilon_0R}$
+\end{enumerate}
+
+%=========================
+\item One mole monatomic ideal gas undergoes quasi-static process $PV^2=\text{constant}$ from $(P_0,V_0)$ to $(P_0/4,2V_0)$. Determine heat exchanged during process.
+
+\begin{enumerate}
+\item $-\dfrac{1}{4}P_0V_0$
+\item $\dfrac{1}{4}P_0V_0$
+\item $\dfrac{1}{2}P_0V_0$
+\item $P_0V_0$
+\end{enumerate}
+
+%=========================
+\item A block of mass $m$ attached to a spring constant $k$ is placed inside an elevator accelerating upward with constant acceleration $a$. Determine angular frequency of small oscillations about new equilibrium.
+
+\begin{center}
+\begin{tikzpicture}
+\draw (0,0)--(2,0);
+\draw[decorate,decoration={zigzag}] (1,0)--(1,-2);
+\draw (0.6,-2)--(1.4,-2)--(1.4,-2.6)--(0.6,-2.6)--cycle;
+\draw[->] (2.5,-2)--(2.5,0);
+\node at (2.8,-1){$a$};
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}
+\item $\sqrt{\dfrac{k}{m}}$
+\item $\sqrt{\dfrac{k}{m}+\dfrac{a}{l}}$
+\item $\sqrt{\dfrac{k}{m}-\dfrac{a}{l}}$
+\item Depends on $a$
+\end{enumerate}
+
+%=========================
+\item An electron in hydrogen atom makes transition from $n=4$ to $n=2$. Determine ratio of emitted photon energy to ground state binding energy.
+
+\begin{enumerate}
+\item $\dfrac{3}{16}$
+\item $\dfrac{1}{4}$
+\item $\dfrac{3}{8}$
+\item $\dfrac{1}{16}$
+\end{enumerate}
+
+%=========================
+\item In Young's double slit experiment immersed in medium of refractive index $\mu$, determine new fringe width.
+
+\begin{enumerate}
+\item $\dfrac{\lambda D}{d}$
+\item $\dfrac{\lambda D}{\mu d}$
+\item $\dfrac{\mu\lambda D}{d}$
+\item $\dfrac{\lambda D}{\mu^2 d}$
+\end{enumerate}
+
+%=========================
+\item A uniform disc rolls without slipping down incline of angle $\theta$. Determine fraction of total kinetic energy that is rotational.
+
+\begin{enumerate}
+\item $\dfrac{1}{2}$
+\item $\dfrac{1}{3}$
+\item $\dfrac{2}{3}$
+\item $\dfrac{1}{4}$
+\end{enumerate}
+
+%=========================
+\item A block of mass $m$ moving with speed $v_0$ collides inelastically with identical block attached to spring constant $k$. Determine maximum compression of spring.
+
+\begin{enumerate}
+\item $\dfrac{mv_0}{\sqrt{2k}}$
+\item $\dfrac{mv_0}{\sqrt{k}}$
+\item $\dfrac{mv_0}{2\sqrt{k}}$
+\item $\dfrac{mv_0}{\sqrt{4k}}$
+\end{enumerate}
+
+%=========================
+\item A charged particle enters perpendicular electric and magnetic fields satisfying $E=vB$. Determine nature of trajectory.
+
+\begin{enumerate}
+\item Circular
+\item Straight line
+\item Helical
+\item Parabolic
+\end{enumerate}
+
+%=========================
+\item A uniform rod of length $L$ and mass $m$ is hinged at one end. A bullet of mass $m/2$ moving with speed $v$ strikes the lower end and sticks. Determine minimum $v$ so that system just completes vertical circle.
+
+\begin{enumerate}
+\item $\sqrt{8gL}$
+\item $\sqrt{10gL}$
+\item $\sqrt{12gL}$
+\item $\sqrt{6gL}$
+\end{enumerate}
+
+%=========================
+\item A long solenoid of radius $R$ carries current $I(t)=I_0\sin\omega t$. Determine amplitude of induced electric field at distance $r<R$ from axis.
+
+\begin{enumerate}
+\item $\dfrac{\mu_0 n\omega I_0 r}{2}$
+\item $\dfrac{\mu_0 n I_0 r}{2}$
+\item $\dfrac{\mu_0 n\omega I_0 R}{2}$
+\item $\dfrac{\mu_0 n\omega I_0 r^2}{2}$
+\end{enumerate}
+
+\end{enumerate}
+
+\end{document}
