@@ -60,7 +60,9 @@ export default function ResultPage() {
     );
   }
 
-  const accuracy = Math.round((result.score / result.totalQuestions) * 100);
+  // For accuracy, we prefer correctCount if available, otherwise fallback to score-based estimate
+  const correctCount = result.correctCount ?? (result.score > 0 ? Math.floor(result.score / 4) : 0);
+  const accuracy = Math.round((correctCount / result.totalQuestions) * 100);
   const timeMins = Math.floor(result.timeTaken / 60);
   const timeSecs = result.timeTaken % 60;
 
@@ -78,7 +80,7 @@ export default function ResultPage() {
           
           <CardContent className="p-8 space-y-10">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <StatCard icon={<Target className="text-primary" />} label="Final Score" value={`${result.score} / ${result.totalQuestions}`} />
+                  <StatCard icon={<Target className="text-primary" />} label="Final Score" value={`${result.score} / ${result.totalQuestions * 4}`} />
                   <StatCard icon={<Check className="text-green-600" />} label="Accuracy" value={`${accuracy}%`} bgColor="bg-green-500/10" />
                   <StatCard icon={<Clock className="text-blue-600" />} label="Time Spent" value={`${timeMins}m ${timeSecs}s`} bgColor="bg-blue-500/10" />
                   <StatCard icon={<Zap className="text-secondary-foreground" />} label="Unattempted" value={(result.totalQuestions - result.answers.filter(a => a.selectedOptionId).length).toString()} bgColor="bg-secondary/40" />

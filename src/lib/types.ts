@@ -87,6 +87,8 @@ export type TestResult = {
   testName: string;
   seriesId: string;
   score: number;
+  correctCount?: number;
+  incorrectCount?: number;
   totalQuestions: number;
   timeTaken: number; // in seconds
   answers: { questionId: string; selectedOptionId: string | null }[];

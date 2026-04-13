@@ -123,7 +123,7 @@ export function Leaderboard({ isOpen, onClose, testId, currentUserId }: Leaderbo
                                             {isMe && <span className="text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full uppercase tracking-tighter">You</span>}
                                         </p>
                                         <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-                                            <span className="flex items-center gap-1"><Target className="w-3 h-3" /> {rank.score} Correct</span>
+                                            <span className="flex items-center gap-1"><Target className="w-3 h-3" /> {rank.score} Marks</span>
                                             <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {formatTime(rank.timeTaken)}</span>
                                         </div>
                                     </div>

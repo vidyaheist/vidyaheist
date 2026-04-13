@@ -38,7 +38,7 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
              <div>
                 <h4 className="font-bold text-lg leading-tight group-hover:text-primary transition-colors">{activity.testName}</h4>
                 <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground font-medium">
-                    <span className="flex items-center gap-1"><Target className="w-3.5 h-3.5" /> {activity.score} / {activity.totalQuestions} Marks</span>
+                    <span className="flex items-center gap-1"><Target className="w-3.5 h-3.5" /> {activity.score} / {activity.totalQuestions * 4} Marks</span>
                     <span className="flex items-center gap-1 border-l pl-3"><Clock className="w-3.5 h-3.5" /> {formatDistanceToNow(new Date(activity.createdAt.seconds * 1000))} ago</span>
                 </div>
              </div>

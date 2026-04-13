@@ -175,8 +175,12 @@ export default function ExamPage() {
     let calculatedScore = 0;
     userAnswers.forEach(ua => {
       const question = questions.find(q => q.id === ua.questionId);
-      if (question && question.correctAnswerId === ua.selectedOptionId) {
-        calculatedScore++;
+      if (question) {
+        if (question.correctAnswerId === ua.selectedOptionId) {
+          calculatedScore += 4;
+        } else if (ua.selectedOptionId) {
+          calculatedScore -= 1;
+        }
       }
     });
     setScore(calculatedScore);
@@ -424,6 +428,7 @@ export default function ExamPage() {
               </div>
               <h3 className="font-semibold text-xl mt-6">Instructions:</h3>
               <ul className="list-disc list-inside text-left text-muted-foreground space-y-1">
+                <li><strong>Scoring:</strong> +4 for correct, -1 for incorrect.</li>
                 <li>Each question has multiple options. Only one option is correct.</li>
                 <li>Ensure you submit the test before the time runs out.</li>
                 <li>You can navigate between questions using the palette.</li>
@@ -434,7 +439,7 @@ export default function ExamPage() {
           {examPhase === 'summary' && (
             <div className="text-center space-y-4">
               <h2 className="text-2xl font-semibold">Test Completed!</h2>
-              <p className="text-lg">Your Score: <span className="font-bold text-primary">{score}</span> out of {questions.length}</p>
+              <p className="text-lg">Your Score: <span className="font-bold text-primary">{score}</span> out of {questions.length * 4}</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
                 <Button onClick={() => setExamPhase('review')} size="lg">Review Answers</Button>
                 <Button onClick={handleStartTest} variant="outline" size="lg">

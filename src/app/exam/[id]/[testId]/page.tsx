@@ -269,9 +269,20 @@ export default function ExamPage() {
     if (!user || !firestore || !test) return;
 
     let finalScore = 0;
+    let correctCount = 0;
+    let incorrectCount = 0;
+
     const finalAnswers = userAnswers.map(ans => {
         const q = questions.find(q => q.id === ans.questionId);
-        if (q && q.correctAnswerId === ans.selectedOptionId) finalScore++;
+        if (q) {
+            if (q.correctAnswerId === ans.selectedOptionId) {
+                finalScore += 4;
+                correctCount++;
+            } else if (ans.selectedOptionId) {
+                finalScore -= 1;
+                incorrectCount++;
+            }
+        }
         return {
             questionId: ans.questionId,
             selectedOptionId: ans.selectedOptionId
@@ -288,6 +299,8 @@ export default function ExamPage() {
         testName: test.name,
         seriesId: id,
         score: finalScore,
+        correctCount,
+        incorrectCount,
         totalQuestions: questions.length,
         timeTaken: timeTaken,
         answers: finalAnswers,
@@ -430,6 +443,7 @@ export default function ExamPage() {
               <h3 className="text-xl font-bold flex items-center gap-2 border-b pb-2"><ListChecks className="text-primary w-5 h-5" /> General Instructions</h3>
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-sm text-muted-foreground list-decimal list-inside px-2">
                 <li>This is a time-bound assessment. Attempt all questions within the allocated time.</li>
+                <li><strong>Marking Scheme:</strong> +4 for each correct answer; -1 for each incorrect answer. No marks are deducted for unattempted questions.</li>
                 <li>The computer clock will be set at the server. The countdown timer in the top-right corner of the screen will display the remaining time.</li>
                 <li>Once the timer disappears, the test will automatically be submitted.</li>
                 <li>Ensure a stable internet connection for the duration of the test.</li>
