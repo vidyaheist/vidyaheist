@@ -278,7 +278,7 @@ function ContactOverlay({ onUnlock }: { onUnlock: () => void }) {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md p-8 rounded-3xl border border-primary/20 bg-card/95 backdrop-blur-2xl shadow-2xl saffron-glow"
+        className="w-full max-w-md p-8 rounded-3xl border border-primary/20 bg-card/95 backdrop-blur-2xl shadow-2xl brand-glow"
       >
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/15 mb-4 animate-bounce">
@@ -355,7 +355,7 @@ function ContactOverlay({ onUnlock }: { onUnlock: () => void }) {
   );
 }
 
-// ─── SHARE RESULT CARD COMPONENT (WITH SAFFRON THEME & SCREENSHOT GENERATOR) ─
+// ─── SHARE RESULT CARD COMPONENT (WITH BRAND BLUE THEME & SCREENSHOT GENERATOR) ─
 
 function ShareResultCard({
   marks,
@@ -402,24 +402,40 @@ Predict yours at: ${typeof window !== "undefined" ? window.location.origin + "/p
       return;
     }
     setCapturing(true);
-    toast({ title: "Generating Screenshot...", description: "Please wait while your HD scorecard compiles." });
+    toast({ title: "Generating Premium Scorecard...", description: "Please wait while your high-fidelity card compiles." });
 
     try {
       const html2canvas = (await import("html2canvas")).default;
 
-      // Temporarily hide action buttons so they are excluded from the clean scorecard image
-      const actionButtons = card.querySelector(".action-buttons-container") as HTMLElement;
-      if (actionButtons) actionButtons.style.display = "none";
+      // Note: .action-buttons-container has data-html2canvas-ignore="true", so it is natively and cleanly ignored without layout reflows!
 
       const canvas = await html2canvas(card, {
         scale: 3, // Premium ultra-crisp resolution
         backgroundColor: null, // Keeps transparent card corners
         useCORS: true,
-        logging: false
-      });
+        logging: false,
+        onclone: (clonedDoc) => {
+          const clonedCard = clonedDoc.getElementById("prediction-result-card") as HTMLElement;
+          if (clonedCard) {
+            // 1. Remove buggy inset shadows and neo-brutalist offset border artifacts
+            clonedCard.style.boxShadow = "none";
+            clonedCard.style.textShadow = "none";
+            
+            // 2. Set an ultra-premium, smooth 2-stop royal blue to deep blue gradient (prevents 3-stop or sharp gold rendering glitches)
+            clonedCard.style.background = "linear-gradient(135deg, #0B5ED7 0%, #063980 100%)";
+            clonedCard.style.border = "2px solid rgba(255, 255, 255, 0.3)";
+            clonedCard.style.padding = "2rem";
 
-      // Restore action buttons instantly
-      if (actionButtons) actionButtons.style.display = "flex";
+            // 3. Strip all backdrop-filter blurs which trigger the grey horizontal bar canvas bug
+            const blurs = clonedCard.querySelectorAll(".backdrop-blur-sm") as NodeListOf<HTMLElement>;
+            blurs.forEach(b => {
+              b.style.backdropFilter = "none";
+              b.style.webkitBackdropFilter = "none";
+              b.style.backgroundColor = "rgba(255, 255, 255, 0.22)";
+            });
+          }
+        }
+      });
 
       const dataUrl = canvas.toDataURL("image/png");
       const link = document.createElement("a");
@@ -427,7 +443,7 @@ Predict yours at: ${typeof window !== "undefined" ? window.location.origin + "/p
       link.href = dataUrl;
       link.click();
 
-      toast({ title: "Screenshot Saved! 📸", description: "HD Scorecard downloaded to your device." });
+      toast({ title: "Scorecard Saved! 📸", description: "Your premium HD Scorecard has been successfully saved." });
     } catch (err) {
       console.error("Screenshot capture error:", err);
       toast({ title: "Screenshot Failed", description: "Could not compile the scorecard image. Copying text instead!" });
@@ -714,7 +730,7 @@ export default function PredictorPage() {
       {/* HEADER SECTION */}
       <div className="text-center mb-8 relative">
         <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground mb-4">
-          IISER College Predictor <span className="text-primary saffron-text-glow">2026</span>
+          IISER College Predictor <span className="text-primary brand-text-glow">2026</span>
         </h1>
         <p className="text-muted-foreground max-w-2xl mx-auto text-base leading-relaxed">
           The IISER College Predictor helps students estimate their chances of admission into IISER institutes based on their IAT score. By analyzing previous year cutoff trends and seat matrix, this predictor estimates your expected rank and possible institutes.
@@ -990,10 +1006,10 @@ export default function PredictorPage() {
             exit={{ opacity: 0 }}
             className="space-y-8"
           >
-            {/* Top Score Banner (Saffron 3D Claymorphic + Neo-Brutalism Offset Card) */}
+            {/* Top Score Banner (Premium Glassmorphic Brand Card) */}
             <div
               id="prediction-result-card"
-              className="relative overflow-hidden rounded-[2rem] p-6 md:p-8 bg-gradient-to-br from-primary via-primary to-accent text-white border-2 border-primary flex flex-col md:flex-row justify-between items-center gap-6 shadow-[inset_4px_4px_8px_0_rgba(255,255,255,0.35),_inset_-6px_-6px_12px_0_rgba(0,0,0,0.3),_8px_8px_0px_0px_rgba(0,0,0,0.9)] dark:shadow-[inset_4px_4px_8px_0_rgba(255,255,255,0.15),_inset_-6px_-6px_12px_0_rgba(0,0,0,0.5),_8px_8px_0px_0px_rgba(255,255,255,0.15)] transition-all duration-300 hover:scale-[1.01]"
+              className="relative overflow-hidden rounded-[2rem] p-6 md:p-8 bg-gradient-to-br from-primary to-[#063980] text-white border border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 shadow-2xl shadow-primary/25 hover:shadow-primary/35 transition-all duration-300 hover:scale-[1.01]"
             >
               {/* Animated Inner Shine */}
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/20 via-transparent to-transparent opacity-40 pointer-events-none" />
@@ -1040,7 +1056,7 @@ export default function PredictorPage() {
               </div>
 
               {/* Action buttons wrapper (hidden during clean screenshots) */}
-              <div className="action-buttons-container flex gap-3 flex-shrink-0 w-full md:w-auto mt-4 md:mt-0 z-10 relative">
+              <div data-html2canvas-ignore="true" className="action-buttons-container flex gap-3 flex-shrink-0 w-full md:w-auto mt-4 md:mt-0 z-10 relative">
                 <button
                   onClick={() => setShowShareModal(true)}
                   className="flex-1 md:flex-none py-3 px-5 rounded-xl border border-white/20 hover:border-white text-white bg-white/10 backdrop-blur-sm font-extrabold flex items-center justify-center gap-2 active:scale-95 transition-all text-xs shadow-md"
@@ -1256,7 +1272,7 @@ export default function PredictorPage() {
       {/* BOTTOM INFO SECTIONS */}
       <div className="border-t border-border mt-16 pt-12 max-w-4xl mx-auto space-y-10">
         {/* Practice links card */}
-        <div className="bg-primary/5 border border-primary/20 rounded-3xl p-6 flex flex-col md:flex-row justify-between items-center gap-6 saffron-glow">
+        <div className="bg-primary/5 border border-primary/20 rounded-3xl p-6 flex flex-col md:flex-row justify-between items-center gap-6 brand-glow">
           <div className="text-center md:text-left">
             <h3 className="text-lg font-bold flex items-center justify-center md:justify-start gap-2 mb-1">
               <Sparkles className="w-5 h-5 text-primary animate-pulse" />

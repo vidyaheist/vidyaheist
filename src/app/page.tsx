@@ -110,11 +110,11 @@ export default function MarketingPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background text-foreground transition-colors duration-300 -mx-4 md:-mx-8 -my-6 md:-my-8">
-      {/* Saffron mouse-follower glow */}
+      {/* Brand mouse-follower glow */}
       <div 
         className="pointer-events-none fixed inset-0 z-0 transition-all duration-500"
         style={{
-          background: `radial-gradient(700px circle at ${mousePosition.x}px ${mousePosition.y}px, hsl(24 90% 55% / 0.07), transparent 70%)`,
+          background: `radial-gradient(700px circle at ${mousePosition.x}px ${mousePosition.y}px, hsl(var(--primary) / 0.07), transparent 70%)`,
         }}
       />
       {/* Static mesh gradient */}
@@ -156,10 +156,10 @@ function HeroSection() {
             
             <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl leading-[1.1]">
               <span className="block">Heist your</span>
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-orange-300 animate-gradient-x" style={{backgroundSize:'200% auto'}}>
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-cyan-400 animate-gradient-x" style={{backgroundSize:'200% auto'}}>
                 Dream College
               </span>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-primary to-orange-400 animate-gradient-x" style={{backgroundSize:'200% auto'}}>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-primary to-blue-400 animate-gradient-x" style={{backgroundSize:'200% auto'}}>
                 with {APP_NAME}
               </span>
             </h1>
@@ -250,7 +250,7 @@ function StatsSection() {
               transition={{ delay: index * 0.1 }}
               className="space-y-2 group"
             >
-              <h3 className="text-3xl md:text-4xl font-extrabold text-primary group-hover:saffron-text-glow transition-all">{stat.value}</h3>
+              <h3 className="text-3xl md:text-4xl font-extrabold text-primary group-hover:brand-text-glow transition-all">{stat.value}</h3>
               <p className="text-sm md:text-base text-muted-foreground font-medium">{stat.label}</p>
             </motion.div>
           ))}
@@ -355,7 +355,7 @@ function TestimonialsSection() {
   }, []);
 
   return (
-    <section className="w-full py-24 relative z-10 overflow-hidden" style={{background: 'linear-gradient(180deg, transparent 0%, hsl(24 90% 55% / 0.04) 50%, transparent 100%)'}}>
+    <section className="w-full py-24 relative z-10 overflow-hidden" style={{background: 'linear-gradient(180deg, transparent 0%, hsl(var(--primary) / 0.04) 50%, transparent 100%)'}}>
       <div className="container px-4 md:px-6 mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl mb-4 text-primary">Success Stories</h2>
@@ -460,7 +460,7 @@ function HowItWorksSection() {
             transition={{ delay: 0.1 }}
             className="text-4xl md:text-5xl font-extrabold tracking-tight"
           >
-            Your Path to <span className="text-primary font-black saffron-text-glow">Victory</span>
+            Your Path to <span className="text-primary font-black brand-text-glow">Victory</span>
           </motion.h2>
           <p className="text-foreground/70 md:text-xl leading-relaxed">
             We've distilled the success strategies of top rankers into a simple, automated 4-step process. No more guessing, just focused execution.
@@ -497,7 +497,7 @@ function HowItWorksSection() {
 
         {/* Centered CTA */}
         <div className="text-center mt-12">
-          <a href="/store" className="inline-flex items-center justify-center px-8 py-4 font-extrabold rounded-full bg-primary text-primary-foreground hover:bg-primary/95 transition-all shadow-lg hover:scale-105 active:scale-95 saffron-glow">
+          <a href="/store" className="inline-flex items-center justify-center px-8 py-4 font-extrabold rounded-full bg-primary text-primary-foreground hover:bg-primary/95 transition-all shadow-lg hover:scale-105 active:scale-95 brand-glow">
             View Test Series
           </a>
         </div>
@@ -508,7 +508,7 @@ function HowItWorksSection() {
 
 function FAQSection() {
   return (
-    <section className="w-full py-24 relative z-10 overflow-hidden" style={{background: 'linear-gradient(180deg, transparent 0%, hsl(24 90% 55% / 0.03) 100%)'}}>
+    <section className="w-full py-24 relative z-10 overflow-hidden" style={{background: 'linear-gradient(180deg, transparent 0%, hsl(var(--primary) / 0.03) 100%)'}}>
       <div className="container px-4 md:px-6 mx-auto max-w-4xl">
         <div className="text-center mb-16 space-y-4">
           <motion.div 
@@ -561,8 +561,8 @@ function CTASection() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="relative rounded-[3rem] overflow-hidden px-6 py-16 md:py-24 text-center text-white shadow-2xl saffron-glow"
-          style={{background: 'linear-gradient(135deg, hsl(24 90% 48%) 0%, hsl(24 90% 40%) 40%, hsl(20 80% 35%) 100%)'}}
+          className="relative rounded-[3rem] overflow-hidden px-6 py-16 md:py-24 text-center text-white shadow-2xl brand-glow"
+          style={{background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(221 80% 40%) 40%, hsl(222 80% 30%) 100%)'}}
         >
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-white/10 rounded-full animate-[spin_60s_linear_infinite] z-0 pointer-events-none"></div>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-white/20 rounded-full animate-[spin_40s_linear_infinite_reverse] z-0 pointer-events-none"></div>

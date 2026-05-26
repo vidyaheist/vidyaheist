@@ -14,97 +14,98 @@ body {
 
   /* ── LIGHT MODE ── */
   :root {
-    /* Saffron & Slate — Light */
-    --background: 36 33% 97%;          /* Warm off-white #F9F6F1 */
-    --foreground: 20 15% 10%;          /* Near-black warm */
+    /* Slate & Royal Blue — Light */
+    --background: 210 40% 98%;          /* Cool slate-50 #F8FAFC */
+    --foreground: 222 47% 11%;          /* Slate-900 #0F172A */
 
-    --card: 36 30% 99%;
-    --card-foreground: 20 15% 10%;
+    --card: 0 0% 100%;                  /* Crisp white cards */
+    --card-foreground: 222 47% 11%;
 
-    --popover: 36 30% 99%;
-    --popover-foreground: 20 15% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 24 90% 48%;             /* Saffron #E8650A */
+    --primary: 221 90% 48%;             /* VidyaHeist Royal Blue #0B5ED7 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 36 20% 92%;           /* Warm light gray */
-    --secondary-foreground: 24 90% 40%;
+    --secondary: 210 40% 96.1%;         /* Cool slate-100 #F1F5F9 */
+    --secondary-foreground: 221 90% 36%;/* Deep brand blue text */
 
-    --muted: 36 15% 88%;
-    --muted-foreground: 20 10% 45%;
+    --muted: 210 40% 92%;               /* Cool slate-200 #E2E8F0 */
+    --muted-foreground: 215.4 16.3% 46.9%; /* Slate-500 #64748B */
 
-    --accent: 43 96% 48%;              /* Golden #F5B800 */
-    --accent-foreground: 20 15% 8%;
+    --accent: 43 96% 48%;              /* Golden Yellow #F5B800 (from 'Heist it.' banner highlights) */
+    --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 36 20% 86%;
-    --input: 36 20% 86%;
-    --ring: 24 90% 48%;
+    --border: 214.3 31.8% 91.4%;        /* Light slate border */
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221 90% 48%;
 
     --radius: 0.75rem;
 
-    --chart-1: 24 90% 48%;   /* Saffron */
-    --chart-2: 43 96% 48%;   /* Gold */
+    --chart-1: 221 90% 48%;   /* Royal Blue */
+    --chart-2: 43 96% 48%;   /* Gold Accent */
     --chart-3: 142 71% 45%;  /* Green */
-    --chart-4: 221 83% 53%;  /* Blue */
+    --chart-4: 201 96% 32%;  /* Sky */
     --chart-5: 280 68% 60%;  /* Purple */
 
-    --sidebar-background: 20 20% 12%;
-    --sidebar-foreground: 36 20% 90%;
-    --sidebar-primary: 24 90% 55%;
+    --sidebar-background: 222 47% 11%;  /* Slate-900 sidebar background */
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 221 90% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 20 20% 18%;
-    --sidebar-accent-foreground: 36 20% 95%;
-    --sidebar-border: 20 20% 20%;
-    --sidebar-ring: 24 90% 48%;
+    --sidebar-accent: 222 47% 16%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 222 47% 16%;
+    --sidebar-ring: 221 90% 48%;
   }
 
   /* ── DARK MODE ── */
   .dark {
-    --background: 222 28% 8%;          /* Deep midnight #0F1117 */
-    --foreground: 36 25% 94%;          /* Warm white */
+    /* Midnight Slate & Royal Blue — Dark */
+    --background: 222 47% 6%;          /* Deep midnight slate-950 #020617 */
+    --foreground: 210 40% 98%;          /* Cool light off-white */
 
-    --card: 222 25% 11%;               /* Slightly lighter than bg */
-    --card-foreground: 36 25% 94%;
+    --card: 222 47% 9%;                /* Slate-900 card backdrop */
+    --card-foreground: 210 40% 98%;
 
-    --popover: 222 25% 11%;
-    --popover-foreground: 36 25% 94%;
+    --popover: 222 47% 9%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 24 90% 55%;             /* Saffron — slightly brighter on dark */
+    --primary: 217.2 91.2% 59.8%;      /* Vibrant electric blue that glows in dark mode */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 20% 16%;          /* Dark slate */
-    --secondary-foreground: 36 25% 90%;
+    --secondary: 222 47% 12%;          /* Dark slate-900 border helper */
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 222 18% 20%;
-    --muted-foreground: 36 10% 55%;
+    --muted: 222 47% 15%;              /* Dark slate-800 muted helper */
+    --muted-foreground: 215.4 16.3% 66.9%;
 
-    --accent: 43 96% 52%;              /* Golden */
-    --accent-foreground: 20 15% 8%;
+    --accent: 43 96% 52%;              /* Golden Yellow */
+    --accent-foreground: 222 47% 11%;
 
-    --destructive: 0 72% 50%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 222 18% 20%;
-    --input: 222 18% 20%;
-    --ring: 24 90% 55%;
+    --border: 222 47% 15%;
+    --input: 222 47% 15%;
+    --ring: 217.2 91.2% 59.8%;
 
-    --chart-1: 24 90% 55%;
+    --chart-1: 217.2 91.2% 59.8%;
     --chart-2: 43 96% 52%;
     --chart-3: 142 71% 50%;
     --chart-4: 217 91% 60%;
     --chart-5: 280 68% 65%;
 
-    --sidebar-background: 222 30% 6%;
-    --sidebar-foreground: 36 20% 88%;
-    --sidebar-primary: 24 90% 55%;
+    --sidebar-background: 222 47% 4%;
+    --sidebar-foreground: 210 40% 90%;
+    --sidebar-primary: 217.2 91.2% 59.8%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 25% 13%;
-    --sidebar-accent-foreground: 36 20% 95%;
-    --sidebar-border: 222 20% 18%;
-    --sidebar-ring: 24 90% 55%;
+    --sidebar-accent: 222 47% 10%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 222 47% 12%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -130,9 +131,9 @@ body {
 /* ── Mesh gradient blob ──────────────────────────────────────────────────── */
 .mesh-gradient {
   background:
-    radial-gradient(ellipse 60% 50% at 20% 30%, hsl(24 90% 55% / 0.18), transparent),
-    radial-gradient(ellipse 50% 60% at 80% 70%, hsl(43 96% 52% / 0.12), transparent),
-    radial-gradient(ellipse 80% 60% at 50% 0%, hsl(24 90% 55% / 0.08), transparent);
+    radial-gradient(ellipse 60% 50% at 20% 30%, hsl(var(--primary) / 0.15), transparent),
+    radial-gradient(ellipse 50% 60% at 80% 70%, hsl(var(--accent) / 0.1), transparent),
+    radial-gradient(ellipse 80% 60% at 50% 0%, hsl(var(--primary) / 0.08), transparent);
 }
 
 /* ── Glowing button ──────────────────────────────────────────────────────── */
@@ -142,7 +143,7 @@ body {
   }
   .nav-link-glow:hover {
     @apply text-primary;
-    text-shadow: 0 0 12px hsl(24 90% 55% / 0.7);
+    text-shadow: 0 0 12px hsl(var(--primary) / 0.6);
   }
 
   .btn-container-glow {
@@ -156,7 +157,7 @@ body {
 
   .btn-container-glow:hover {
     @apply shadow-lg scale-[1.02];
-    box-shadow: 0 0 20px hsl(24 90% 55% / 0.4);
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.35);
   }
 
   .btn-container-glow::before {
@@ -188,7 +189,7 @@ body {
 
   .login-button-submit {
     @apply w-full py-4 bg-primary text-primary-foreground font-bold rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg mt-2;
-    box-shadow: 0 4px 24px hsl(24 90% 55% / 0.4);
+    box-shadow: 0 4px 24px hsl(var(--primary) / 0.3);
   }
 
   .login-p {
@@ -215,13 +216,13 @@ body {
     @apply relative flex items-center gap-4 before:content-[''] before:h-[1px] before:flex-1 before:bg-border after:content-[''] after:h-[1px] after:flex-1 after:bg-border;
   }
 
-  /* ── Saffron glow utility ── */
-  .saffron-glow {
-    box-shadow: 0 0 30px hsl(24 90% 55% / 0.35), 0 0 80px hsl(24 90% 55% / 0.15);
+  /* ── Brand glow utility ── */
+  .brand-glow {
+    box-shadow: 0 0 30px hsl(var(--primary) / 0.35), 0 0 80px hsl(var(--primary) / 0.15);
   }
 
-  .saffron-text-glow {
-    text-shadow: 0 0 30px hsl(24 90% 55% / 0.5);
+  .brand-text-glow {
+    text-shadow: 0 0 30px hsl(var(--primary) / 0.5);
   }
 
   /* ── Card hover effect ── */
@@ -230,7 +231,7 @@ body {
   }
   .card-hover:hover {
     @apply border-primary/50 shadow-xl;
-    box-shadow: 0 8px 40px hsl(24 90% 55% / 0.15);
+    box-shadow: 0 8px 40px hsl(var(--primary) / 0.15);
   }
 
   /* ── Hybrid Claymorphism + Glassmorphism + Neo-brutalism Card ── */

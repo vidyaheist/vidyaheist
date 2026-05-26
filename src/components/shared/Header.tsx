@@ -47,7 +47,7 @@ export function Header() {
   const navItems = !loading && user ? (isAdmin ? [...signedInNavItems, ...adminNavItems] : signedInNavItems) : signedOutNavItems;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-primary/20 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70" style={{boxShadow: '0 1px 0 0 hsl(24 90% 55% / 0.15), 0 4px 20px 0 hsl(222 28% 8% / 0.5)'}}>
+    <header className="sticky top-0 z-50 w-full border-b border-primary/20 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70" style={{boxShadow: '0 1px 0 0 hsl(var(--primary) / 0.15), 0 4px 20px 0 hsl(222 28% 8% / 0.5)'}}>
       <div className="container flex h-16 items-center">
         <Link href={user ? "/dashboard" : "/"} className="mr-6 flex items-center space-x-2">
           <Image src="/logo.jpeg" alt={`${APP_NAME} Logo`} width={32} height={32} className="h-8 w-8 object-contain rounded-sm" />
