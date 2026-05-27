@@ -11,7 +11,8 @@ export async function POST(req: Request) {
       razorpay_order_id, 
       razorpay_payment_id, 
       razorpay_signature,
-      purchaseId // We'll pass the document ID from the client
+      purchaseId, // We'll pass the document ID from the client
+      isBook
     } = body;
 
     const secret = process.env.RAZORPAY_KEY_SECRET;
@@ -34,12 +35,14 @@ export async function POST(req: Request) {
 
     // Since the payment is valid, update the Firebase document bypassing rules using admin API
     if (purchaseId && adminDb) {
-      await adminDb.collection("purchases").doc(purchaseId).update({
-        status: "success",
+      const col = isBook ? "bookOrders" : "purchases";
+      const updateData: any = {
+        status: isBook ? "verified" : "success",
         razorpay_order_id,
         razorpay_payment_id,
         updatedAt: new Date()
-      });
+      };
+      await adminDb.collection(col).doc(purchaseId).update(updateData);
     }
 
     return NextResponse.json({ success: true }, { status: 200 });

@@ -104,3 +104,33 @@ export type ExamProgress = {
   timeLeft: number;
   updatedAt: any;
 };
+
+export type BookType = {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string | null;
+  pdfUrl?: string | null;
+  price: number;
+  content: string;
+  subject: string;
+  createdAt: any;
+  updatedAt: any;
+};
+
+export type BookOrderType = {
+  id: string;
+  bookId: string;
+  bookName: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  amount: number;
+  utr?: string;
+  mobile?: string;
+  address?: string;
+  status: 'pending' | 'verified' | 'rejected' | 'processing' | 'shipped' | 'delivered';
+  trackingInfo?: string;
+  createdAt: any;
+  updatedAt: any;
+};

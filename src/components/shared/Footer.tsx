@@ -16,13 +16,13 @@ export function Footer() {
   if (!shouldShowFooter) return null;
 
   return (
-    <footer className="border-t bg-card text-card-foreground">
+    <footer className="border-t bg-card text-card-foreground pb-20 md:pb-0">
       <div className="container py-12 px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           <div className="space-y-4">
             <Link href="/" className="flex items-center space-x-2">
                  <Image src="/logo.jpeg" alt={`${APP_NAME} Logo`} width={32} height={32} className="rounded-sm" />
-                 <span className="text-2xl font-bold">{APP_NAME}</span>
+                 <span className="text-2xl font-bold text-primary">{APP_NAME}</span>
             </Link>
             <p className="text-sm text-muted-foreground">
               Your partner in acing top research exams.

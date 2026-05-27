@@ -5,15 +5,16 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useAuth, useUser, useFirestore } from "@/firebase";
+import { useAuth, useUser, useFirestore, useCollection, useDoc } from "@/firebase";
 import { updatePassword, updateProfile } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
+import type { PurchaseType, BookOrderType } from "@/lib/types";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Award, BarChart2, BookOpenCheck, Edit3, KeyRound, Loader2, User as UserIcon, Phone, Image as ImageIcon, Target, TrendingUp, History } from "lucide-react";
+import { Award, BarChart2, BookOpenCheck, Edit3, KeyRound, Loader2, User as UserIcon, Phone, Image as ImageIcon, Target, TrendingUp, History, Truck } from "lucide-react";
 import { formatDistanceToNow } from 'date-fns';
 import { useUserAnalytics } from "@/hooks/useUserAnalytics";
 import { PerformanceTrend } from "@/components/shared/analytics/PerformanceTrend";
@@ -49,7 +50,8 @@ const changePasswordSchema = z.object({
 
 const editProfileSchema = z.object({
   displayName: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  mobileNumber: z.string().regex(/^\d{10}$/, { message: "Mobile number must be 10 digits." }),
+  mobileNumber: z.string().regex(/^\d{10}$/, { message: "Mobile number must be 10 digits." }).or(z.literal("")),
+  address: z.string().optional().or(z.literal("")),
   photoURL: z.string().url({ message: "Please enter a valid image URL." }).or(z.literal("")),
 });
 
@@ -65,6 +67,18 @@ export default function ProfilePage() {
   const { toast } = useToast();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
+  const { data: dbUser } = useDoc<any>({ path: user ? `users/${user.uid}` : null });
+
+  const { data: allPurchases, loading: purchasesLoading } = useCollection<PurchaseType>("purchases");
+  const { data: allBookOrders, loading: bookOrdersLoading } = useCollection<BookOrderType>("bookOrders");
+
+  const myPurchases = allPurchases?.filter(p => {
+    if (p.userId !== user?.uid) return false;
+    const isUnpaidRazorpay = p.status === 'pending' && (p as any).razorpay_order_id && !(p as any).razorpay_payment_id;
+    return !isUnpaidRazorpay;
+  }) || [];
+  const myBookOrders = allBookOrders?.filter(o => o.userId === user?.uid) || [];
+
   const passwordForm = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {
@@ -78,6 +92,7 @@ export default function ProfilePage() {
     defaultValues: {
       displayName: "",
       mobileNumber: "",
+      address: "",
       photoURL: "",
     },
   });
@@ -89,12 +104,13 @@ export default function ProfilePage() {
       } else {
         profileForm.reset({
           displayName: user.displayName || "",
-          mobileNumber: "",
+          mobileNumber: dbUser?.mobileNumber || "",
+          address: dbUser?.address || "",
           photoURL: user.photoURL || "",
         });
       }
     }
-  }, [user, userLoading, router, profileForm]);
+  }, [user, userLoading, dbUser, router, profileForm]);
 
   async function onChangePasswordSubmit(data: ChangePasswordFormValues) {
     if (!auth?.currentUser) {
@@ -135,6 +151,7 @@ export default function ProfilePage() {
       await updateDoc(userDocRef, {
         displayName: data.displayName,
         mobileNumber: data.mobileNumber,
+        address: data.address || "",
         photoURL: data.photoURL || null,
       });
 
@@ -193,6 +210,16 @@ export default function ProfilePage() {
           <div className="text-center sm:text-left">
             <CardTitle className="text-2xl">{displayName}</CardTitle>
             <CardDescription>{user.email}</CardDescription>
+            {dbUser?.mobileNumber && (
+              <CardDescription className="flex items-center gap-1.5 justify-center sm:justify-start text-xs font-semibold">
+                <Phone className="w-3.5 h-3.5 text-primary" /> {dbUser.mobileNumber}
+              </CardDescription>
+            )}
+            {dbUser?.address && (
+              <CardDescription className="flex items-center gap-1.5 justify-center sm:justify-start text-xs font-semibold">
+                <Truck className="w-3.5 h-3.5 text-primary" /> {dbUser.address}
+              </CardDescription>
+            )}
             <CardDescription>Joined: {joinDate}</CardDescription>
           </div>
           
@@ -238,6 +265,22 @@ export default function ProfilePage() {
                             <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                             <FormControl>
                               <Input className="pl-9" placeholder="10-digit number" {...field} maxLength={10} />
+                            </FormControl>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={profileForm.control}
+                      name="address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Shipping Address</FormLabel>
+                          <div className="relative">
+                            <Truck className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <FormControl>
+                              <Input className="pl-9" placeholder="House/Flat No, Area, City, Pincode" {...field} />
                             </FormControl>
                           </div>
                           <FormMessage />
@@ -312,12 +355,81 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-primary flex items-center">
-              <BookOpenCheck className="mr-2 h-5 w-5" /> Purchased Test Series
-            </h3>
-            <p className="text-sm text-muted-foreground">No test series purchased yet. (Feature coming soon)</p>
-             <Button variant="link" className="p-0 h-auto" onClick={() => router.push('/store')}>Browse Store</Button>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold text-primary flex items-center mb-3">
+                <BookOpenCheck className="mr-2 h-5 w-5" /> Purchased Test Series
+              </h3>
+              {purchasesLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              ) : myPurchases.length === 0 ? (
+                <div className="text-sm text-muted-foreground bg-secondary/50 p-4 rounded-xl border font-semibold">
+                  No courses purchased yet.{" "}
+                  <Button variant="link" className="p-0 h-auto font-black text-primary" onClick={() => router.push('/store')}>
+                    Browse Store
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {myPurchases.map(p => (
+                    <div key={p.id} className="flex justify-between items-center bg-secondary/30 p-3 rounded-xl border text-sm font-semibold">
+                      <span>{p.seriesName}</span>
+                      <span className={`px-2.5 py-0.5 rounded text-[10px] uppercase font-black ${
+                        p.status === 'verified' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                      }`}>{p.status}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold text-primary flex items-center mb-3">
+                <History className="mr-2 h-5 w-5" /> Book Orders & Tracking
+              </h3>
+              {bookOrdersLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              ) : myBookOrders.length === 0 ? (
+                <div className="text-sm text-muted-foreground bg-secondary/50 p-4 rounded-xl border font-semibold">
+                  No study books ordered yet.{" "}
+                  <Button variant="link" className="p-0 h-auto font-black text-primary" onClick={() => router.push('/store')}>
+                    Browse Books
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {myBookOrders.map(o => (
+                    <div key={o.id} className="bg-secondary/40 p-4 rounded-xl border space-y-2 text-xs font-semibold">
+                      <div className="flex justify-between items-start gap-2">
+                        <span className="font-extrabold text-sm">{o.bookName}</span>
+                        <span className={`px-2 py-0.5 rounded text-[9px] uppercase font-black ${
+                          o.status === 'verified' || o.status === 'processing' || o.status === 'shipped' || o.status === 'delivered'
+                            ? 'bg-green-100 text-green-700'
+                            : (o.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700')
+                        }`}>
+                          {o.status}
+                        </span>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-[10px] text-muted-foreground pt-1 border-t border-dashed">
+                        <div>UTR: <span className="font-mono text-foreground">{o.utr || "FREE"}</span></div>
+                        <div>Price: <span className="text-foreground">₹{o.amount}</span></div>
+                      </div>
+
+                      {o.trackingInfo && (
+                        <div className="bg-primary/5 p-2.5 rounded border border-primary/20 mt-1 flex gap-2 items-center">
+                          <Truck className="w-4 h-4 text-primary shrink-0" />
+                          <div className="text-[10px] leading-tight">
+                            <span className="font-extrabold block text-primary">Delivery Tracking Info:</span>
+                            <span className="text-muted-foreground font-semibold break-all">{o.trackingInfo}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
 

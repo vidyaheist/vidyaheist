@@ -7,11 +7,13 @@ import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/shared/Header';
 import { Footer } from '@/components/shared/Footer';
 import { APP_NAME } from '@/lib/constants';
+import { BottomNavbar } from '@/components/shared/BottomNavbar';
 
 import { Geist, Geist_Mono, Plus_Jakarta_Sans } from 'next/font/google';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { FloatingContact } from '@/components/shared/FloatingContact';
+import { CartProvider } from '@/providers/CartProvider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -41,6 +43,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof Element !== 'undefined' && Element.prototype.releasePointerCapture) {
+                const originalRelease = Element.prototype.releasePointerCapture;
+                Element.prototype.releasePointerCapture = function(pointerId) {
+                  try {
+                    originalRelease.call(this, pointerId);
+                  } catch (e) {}
+                };
+              }
+            `
+          }}
+        />
+      </head>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased flex flex-col",
@@ -51,19 +69,22 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
-          enableSystem
+          defaultTheme="light"
+          forcedTheme="light"
           disableTransitionOnChange
         >
           <FirebaseClientProvider>
-            <Header />
-            <main className="flex-grow container mx-auto px-4 py-6 md:py-8">
-              {children}
-            </main>
-            <Footer />
-            <Toaster />
-            <FirebaseErrorListener />
-            <FloatingContact />
+            <CartProvider>
+              <Header />
+              <main className="flex-grow container mx-auto px-4 py-6 md:py-8 pb-24 md:pb-8">
+                {children}
+              </main>
+              <Footer />
+              <BottomNavbar />
+              <Toaster />
+              <FirebaseErrorListener />
+              <FloatingContact />
+            </CartProvider>
           </FirebaseClientProvider>
         </ThemeProvider>
       </body>

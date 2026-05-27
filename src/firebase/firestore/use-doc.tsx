@@ -5,15 +5,16 @@ import { useFirestore } from '@/firebase/provider';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 
-export function useDoc<T>({ path }: { path: string }) {
+export function useDoc<T>({ path }: { path?: string | null }) {
   const firestore = useFirestore();
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!firestore) {
+    if (!firestore || !path) {
       setLoading(false);
+      setData(null);
       return;
     }
 
