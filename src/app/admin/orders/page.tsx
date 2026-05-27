@@ -76,12 +76,16 @@ export default function AdminOrdersPage() {
     );
   }
 
-  const filteredPurchases = allPurchases?.filter(p => 
-    (p.utr?.toLowerCase() || "").includes(searchTerm.toLowerCase()) || 
-    (p.razorpay_payment_id?.toLowerCase() || "").includes(searchTerm.toLowerCase()) || 
-    (p.userEmail?.toLowerCase() || "").includes(searchTerm.toLowerCase()) || 
-    (p.seriesName?.toLowerCase() || "").includes(searchTerm.toLowerCase())
-  ).sort((a, b) => {
+  const filteredPurchases = allPurchases?.filter(p => {
+    // Hide unpaid/abandoned Razorpay orders
+    const isUnpaidRazorpay = p.status === 'pending' && (p as any).razorpay_order_id && !(p as any).razorpay_payment_id;
+    if (isUnpaidRazorpay) return false;
+
+    return (p.utr?.toLowerCase() || "").includes(searchTerm.toLowerCase()) || 
+      ((p as any).razorpay_payment_id?.toLowerCase() || "").includes(searchTerm.toLowerCase()) || 
+      (p.userEmail?.toLowerCase() || "").includes(searchTerm.toLowerCase()) || 
+      (p.seriesName?.toLowerCase() || "").includes(searchTerm.toLowerCase());
+  }).sort((a, b) => {
     const timeA = a.createdAt?.seconds || 0;
     const timeB = b.createdAt?.seconds || 0;
     return timeB - timeA;

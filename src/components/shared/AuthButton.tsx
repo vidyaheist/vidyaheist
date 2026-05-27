@@ -58,13 +58,11 @@ export function AuthButton() {
   if (user) {
     return (
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={avatarUrl} alt={displayName} />
-              <AvatarFallback>{displayName.substring(0, 1).toUpperCase()}</AvatarFallback>
-            </Avatar>
-          </Button>
+        <DropdownMenuTrigger className="focus:outline-none cursor-pointer rounded-full overflow-hidden block">
+          <Avatar className="h-8 w-8 hover:opacity-85 transition-opacity">
+            <AvatarImage src={avatarUrl} alt={displayName} />
+            <AvatarFallback>{displayName.substring(0, 1).toUpperCase()}</AvatarFallback>
+          </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">

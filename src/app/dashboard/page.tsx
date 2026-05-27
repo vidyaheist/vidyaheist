@@ -46,7 +46,7 @@ export default function DashboardPage() {
         ? `You currently have # ${recentActivity[0]?.rank || '-'} rank in your last attempt.` 
         : "Complete a test to see your global ranking.",
       href: "/profile",
-      icon: <Award className="w-8 h-8 text-secondary" />,
+      icon: <Award className="w-8 h-8 text-primary" />,
     },
     {
       title: "Performance Analytics",
@@ -60,7 +60,7 @@ export default function DashboardPage() {
       title: "Manage Profile",
       description: "Update your personal details, profile picture, and security.",
       href: "/profile",
-      icon: <User className="w-8 h-8 text-muted-foreground" />,
+      icon: <User className="w-8 h-8 text-primary" />,
     },
   ];
 

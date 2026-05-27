@@ -14,8 +14,18 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      // Use lowercase for robust comparison
-      return isUserAuthenticated() && request.auth.token.email.lower() == 'vidyaheist@gmail.com';
+      // Use lowercase for robust comparison and support database roles
+      return isUserAuthenticated() && (
+        request.auth.token.email.lower() == 'vidyaheist@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    function isMicroAdmin() {
+      return isUserAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'microadmin';
     }
  
     match /users/{userId} {
@@ -67,6 +77,37 @@ service cloud.firestore {
     match /examProgress/{progressId} {
       // progressId is {userId}_{testId}
       allow read, write: if isUserAuthenticated() && (progressId.split('_')[0] == request.auth.uid);
+    }
+
+    // Secure Books collection
+    match /books/{bookId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Secure Book Orders collection
+    match /bookOrders/{orderId} {
+      allow read: if isUserAuthenticated() && 
+        (resource.data.userId == request.auth.uid || isAdmin() || isMicroAdmin());
+      allow create: if isUserAuthenticated() && 
+        request.resource.data.userId == request.auth.uid && 
+        request.resource.data.status == 'pending';
+      allow update: if isAdmin() || (isMicroAdmin() && 
+        resource.data.status != 'pending' && 
+        resource.data.status != 'rejected' &&
+        (request.resource.data.status == 'processing' || 
+         request.resource.data.status == 'shipped' || 
+         request.resource.data.status == 'delivered') &&
+        request.resource.data.userId == resource.data.userId &&
+        request.resource.data.bookId == resource.data.bookId
+      );
+    }
+
+    // Secure Counselling Leads collection
+    match /counsellingQueries/{queryId} {
+      allow read: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isAdmin();
     }
   }
 }
