@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, memo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, memo, useRef, Suspense } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { APP_NAME, ADMIN_EMAIL } from "@/lib/constants";
 import type { QuestionType, TestSeriesType, TestType, UserAnswer, ExamPhase } from "@/lib/types";
@@ -107,7 +107,7 @@ const QuestionPalette = memo(function QuestionPalette({
   );
 });
 
-export default function ExamPage() {
+function ExamContent() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
@@ -667,5 +667,17 @@ export default function ExamPage() {
 
 
     </div>
+  );
+}
+
+export default function ExamPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center py-20">
+        <Loader2 className="animate-spin h-12 w-12 text-primary" />
+      </div>
+    }>
+      <ExamContent />
+    </Suspense>
   );
 }

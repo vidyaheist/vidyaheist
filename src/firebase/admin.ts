@@ -12,8 +12,8 @@ if (!admin.apps.length) {
         credential: admin.credential.cert({
           projectId,
           clientEmail,
-          // Replace escaped newlines from environment variables
-          privateKey: privateKey.replace(/\\n/g, '\n'),
+          // Replace escaped newlines and strip surrounding double quotes from environment variables
+          privateKey: privateKey.replace(/\\n/g, '\n').replace(/"/g, '').trim(),
         }),
       });
     } catch (error) {

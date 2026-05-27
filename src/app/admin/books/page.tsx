@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser, useFirestore, useCollection, useStorage } from "@/firebase";
 import type { BookType } from "@/lib/types";
@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 
-export default function AdminBooksPage() {
+function AdminBooksContent() {
   const { user, loading: userLoading, isAdmin } = useUser();
   const firestore = useFirestore();
   const router = useRouter();
@@ -524,5 +524,17 @@ export default function AdminBooksPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminBooksPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    }>
+      <AdminBooksContent />
+    </Suspense>
   );
 }
